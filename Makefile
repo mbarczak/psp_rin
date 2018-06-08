@@ -5,7 +5,7 @@ PBP = EBOOT.PBP
 BINARY = out
 OBJS = startup.o gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 	gbcore/rom.o gbcore/mbc.o gbcore/apu.o gbcore/cheat.o \
-	main.o pg.o renderer.o menu.o filer.o sound.o saveload.o image.o gz.o \
+	main.o pg.o renderer.o rewind.o menu.o filer.o sound.o saveload.o image.o gz.o \
 	syscall.o
 LIBS = lib/unziplib.a lib/libpng.a lib/libz.a -lc
 

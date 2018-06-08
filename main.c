@@ -1,4 +1,5 @@
 #include "main.h"
+#include "rewind.h" //davex
 
 volatile int bSleep=0;
 int bMenu=0;
@@ -8,6 +9,10 @@ char RomPath[MAX_PATH];
 char RomName[MAX_NAME];
 char SavePath[MAX_PATH];
 char CheatPath[MAX_PATH];
+
+//davex
+int save_period_frames = 0;
+const int WAIT_MILIS = (70+70)*1000; 
 
 void set_cpu_clock(int n)
 {
@@ -29,6 +34,8 @@ int exit_callback(void)
 	save_config();
 	if (rom_get_loaded() && rom_has_battery())
 		save_sram(get_sram(), rom_get_info()->ram_size);
+	
+	free_rewind_states();//davex
 	
 	sceKernelExitGame();
 	return 0;
@@ -116,11 +123,12 @@ int SetupCallbacks(void)
 
 void mainloop(void)
 {
-#ifdef DEBUG
-	unsigned long framecount=0;
+#ifdef DEBUG	
 	unsigned long lastclock=sceKernelLibcClock();
 	unsigned long lasttick=lastclock;
 #endif
+
+	unsigned long framecount=0;
 	const unsigned int sync_time=16666;
 	unsigned long cur_time = sceKernelLibcClock();
 	unsigned long cur_time_bak = cur_time;
@@ -128,6 +136,10 @@ void mainloop(void)
 	unsigned long next_time = cur_time + sync_time;
 	unsigned long waitfc=0;
 	int line, turbo_bak=0;
+	
+	ctrl_data_t paddata;// davex: for rewind checking
+	allocate_rewind_states();
+	save_period_frames = 10;
 
 	for(;;) {
 		for(line=0; line<154; line++)
@@ -135,7 +147,7 @@ void mainloop(void)
 		
 		cur_time = sceKernelLibcClock();
 #ifdef DEBUG
-		framecount++;
+		
 		if (framecount>=60) {
 			unsigned long l;
 
@@ -173,6 +185,16 @@ void mainloop(void)
 		}
 		pgScreenFlip();
 #else
+
+		framecount++;
+		
+		//davex
+		if( framecount ==  save_period_frames){
+			save_rewind_state();
+			framecount = 0;
+		}
+
+
 		if (bTurbo){
 			turbo_bak = 1;
 			skip++;
@@ -221,6 +243,42 @@ void mainloop(void)
 			if (now_frame==0) pgScreenFlip();
 		}
 #endif
+	
+
+		//>>>davex: rewind check
+		sceCtrlPeekBufferPositive(&paddata, 1);
+		if( get_nShortcutKey(paddata.buttons) == 8 ){ // 8 == REWIND_SHORTCUT KEY
+	
+			wavout_enable=0; 
+			
+			while(1){
+				
+				//begin rewinds
+				if( read_rewind_state() > 0 ){
+					
+					for(line=0; line<154; line++) //emulate a frame
+						gb_run();
+							
+					pgScreenFlip();
+				}
+				
+				sceKernelDelayThread(WAIT_MILIS);
+				
+
+				sceCtrlPeekBufferPositive(&paddata, 1);
+				if( get_nShortcutKey(paddata.buttons) != 8 )
+					break;
+				
+			}
+			
+			//continue normal emulation
+			if(setting.sound) wavout_enable=1;
+			cur_time = sceKernelLibcClock();
+			prev_time = cur_time;
+			next_time = cur_time + sync_time;
+			skip=0;
+		}
+		//<<<
 		
 		// ƒƒjƒ…[
 		if(bMenu){

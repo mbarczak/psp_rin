@@ -1,5 +1,5 @@
 //---------------------------------------------
-// エミュレーション結果の表現法/インターフェース
+// ?G?~?.?O_[?V?I?"O<%??\O_-@/?C?"?^_[?t?F_[?X
 
 #ifndef RENDERER_H
 #define RENDERER_H
@@ -20,6 +20,14 @@ enum{
 	SCR_X2_FIT_BL,
 	SCR_FULL_BL,
 #endif
+	SCR_X1_MIRROR,//davex: mirroring modes
+	SCR_X15_MIRROR,
+	SCR_X2_UNCROPED_MIRROR,
+	SCR_X2_FIT_MIRROR,
+	SCR_X2_SCANLINE_MIRROR,
+	SCR_X2_UTOP_MIRROR,
+	SCR_X2_UBOTTOM_MIRROR,
+	SCR_FULL_MIRROR,
 	SCR_END,
 };
 extern const char *scr_names[];

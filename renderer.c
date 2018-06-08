@@ -23,10 +23,39 @@ const char *scr_names[] = {
 	"x2 (fit) BL",
 	"FULL BL",
 #endif
+    "x1 MIRROR",//davex: mirror modes
+	"x1.5 (filtered) MIRROR",
+	"x2 (uncropped) MIRROR",
+	"x2 (fit) MIRROR",
+	"x2 (scanline) MIRROR",
+	"x2 (uncropped without top) MIRROR",
+	"x2 (uncropped without bottom) MIRROR",
+	"FULL MIRROR",
+
 };
 
 #define GBWIDTH  160
 #define GBHEIGHT 144
+
+unsigned short vframe_mirror[SIZE_LINE*(144+112)];
+int g_mirror_on = 0;
+
+//davex: vframe mirroring (only works if USE_GPU is not defined)
+void vframe_mirroring( unsigned short *pvframe  ){    
+    int i, j;
+    unsigned short *pvframe_mirror;
+    pvframe_mirror = vframe_mirror;
+    for( j = 0; j<256; j++){
+    	for( i = 0; i< 176; i++){
+    		pvframe_mirror[i] = pvframe[175 - i];
+    	}
+    	pvframe_mirror += 176;
+    	pvframe += 176;
+    }
+}
+
+
+
 
 void render_screen(void *buf)
 {
@@ -34,6 +63,10 @@ void render_screen(void *buf)
 		pgFillBox(0,263,479,271,0);
 		render_msg_mode--;
 	}
+	
+	
+	
+	g_mirror_on = 0; //default
 	
 	switch(setting.screensize){
 		case SCR_X1:
@@ -75,6 +108,59 @@ void render_screen(void *buf)
 			pgBitBltGe(0,0,480,272,buf);
 			break;
 #endif
+		case SCR_X1_MIRROR:
+			vframe_mirroring( (unsigned short*) buf);
+			g_mirror_on = 1;	
+			
+			if (border_uploaded && now_gb_mode==2){
+				pgBitBltSgb(112,24,(unsigned long *)sgb_border_buffer);
+				border_uploaded--;
+			}
+			pgBitBltN1(160,64,(unsigned long *)vframe_mirror);
+			break;
+		case SCR_X15_MIRROR:
+			vframe_mirroring( (unsigned short*) buf);
+			g_mirror_on = 1;
+			
+			pgBitBltN15(120,28,(unsigned long *)vframe_mirror);
+			break;
+		case SCR_X2_UNCROPED_MIRROR:
+			vframe_mirroring( (unsigned short*) buf);
+			g_mirror_on = 1;
+			
+			pgBitBltN2(80,0,GBHEIGHT-8,(unsigned long *)vframe_mirror);
+			break;
+		case SCR_X2_FIT_MIRROR:
+			vframe_mirroring( (unsigned short*) buf);
+			g_mirror_on = 1;
+			
+			pgBitBltSt2Fix(80,0,GBHEIGHT,2,(unsigned short *)vframe_mirror);
+			break;
+		case SCR_X2_SCANLINE_MIRROR:
+			vframe_mirroring( (unsigned short*) buf);
+			g_mirror_on = 1;
+			
+			pgBitBltStScan(80,0,GBHEIGHT-8,(unsigned long *)vframe_mirror);
+			break;
+		case SCR_X2_UTOP_MIRROR:
+			vframe_mirroring( (unsigned short*) buf);
+			g_mirror_on = 1;
+			
+			pgBitBltSt2wotop(80,0,GBHEIGHT,(unsigned long *)vframe_mirror);
+			break;
+		case SCR_X2_UBOTTOM_MIRROR:
+			vframe_mirroring( (unsigned short*) buf);
+			g_mirror_on = 1;
+			
+			pgBitBltSt2wobot(80,0,GBHEIGHT,(unsigned long *)vframe_mirror);
+			break;
+		case SCR_FULL_MIRROR:
+			vframe_mirroring( (unsigned short*) buf);
+			g_mirror_on = 1;
+			
+			pgBitBltStFull(0,0,GBHEIGHT,3,(unsigned short *)vframe_mirror);
+			break;
+
 		default:
 			pgBitBltN1(160,64,(unsigned long *)buf);
 	}
@@ -124,16 +210,32 @@ void renderer_update_pad()
 		pad_state|=8;
 	if(paddata.buttons & CTRL_DOWN)  pad_state|=16;
 	if(paddata.buttons & CTRL_UP)    pad_state|=32;
-	if(paddata.buttons & CTRL_LEFT)  pad_state|=64;
-	if(paddata.buttons & CTRL_RIGHT) pad_state|=128;
+	
+	
+	//davex
+	if( g_mirror_on){
+		if(paddata.buttons & CTRL_LEFT)  pad_state|=128;
+		if(paddata.buttons & CTRL_RIGHT) pad_state|=64;
+	}else{
+		if(paddata.buttons & CTRL_LEFT)  pad_state|=64;
+		if(paddata.buttons & CTRL_RIGHT) pad_state|=128;
+	}
+	
 	
 	// kmg
 	// Analog pad state
 	if(setting.analog2dpad){
 		if (paddata.analog[CTRL_ANALOG_Y] > UPPER_THRESHOLD) pad_state|=0x10; // DOWN
 		if (paddata.analog[CTRL_ANALOG_Y] < LOWER_THRESHOLD) pad_state|=0x20; // UP
-		if (paddata.analog[CTRL_ANALOG_X] < LOWER_THRESHOLD) pad_state|=0x40; // LEFT
-		if (paddata.analog[CTRL_ANALOG_X] > UPPER_THRESHOLD) pad_state|=0x80; // RIGHT
+		
+		
+		if( g_mirror_on){
+			if (paddata.analog[CTRL_ANALOG_X] < LOWER_THRESHOLD) pad_state|=0x80; 
+			if (paddata.analog[CTRL_ANALOG_X] > UPPER_THRESHOLD) pad_state|=0x40; 
+		}else{
+			if (paddata.analog[CTRL_ANALOG_X] < LOWER_THRESHOLD) pad_state|=0x40; // LEFT
+			if (paddata.analog[CTRL_ANALOG_X] > UPPER_THRESHOLD) pad_state|=0x80; // RIGHT
+		}
 	}
 	
 	int n = get_nShortcutKey(paddata.buttons);
@@ -161,11 +263,16 @@ void renderer_update_pad()
 			bPad=0;
 			break;
 		case 8:
+			//davex: key assigned to rewind
+			/*
 			setting.vsync = !setting.vsync;
 			if(setting.vsync)
 				renderer_set_msg("VSYNC:ON");
 			else
 				renderer_set_msg("VSYNC:OFF");
+			
+			renderer_set_msg("REWIND KEY PRESS");
+			*/
 			break;
 		case 9:
 			setting.sound = !setting.sound;

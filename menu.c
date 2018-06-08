@@ -49,6 +49,11 @@ void init_config()
 	setting.skeys[8].buttons = CTRL_RTRIGGER|CTRL_START;
 	setting.skeys[8].n = 12;
 	
+	//davex: default key for rewinding
+	setting.skeys[9].buttons = CTRL_RTRIGGER;
+	setting.skeys[9].n = 8;
+	
+	
 	setting.analog2dpad=1;
 	setting.thumb = 1;
 	setting.cpu_clock = 0;
@@ -475,7 +480,7 @@ void rin_keyconfig(void)
 		CONFIG_START,
 		CONFIG_MENU,
 		CONFIG_WAIT,
-		CONFIG_VSYNC,
+		CONFIG_REWIND,//davex: CONFIG_VSYNC replaced
 		CONFIG_SOUND,
 		CONFIG_SCREENSIZE,
 		CONFIG_QUICKSAVE,
@@ -555,7 +560,8 @@ void rin_keyconfig(void)
 		pgPrint(x,y++,setting.color[3],"  START BUTTON   :");
 		pgPrint(x,y++,setting.color[3],"  MENU BUTTON    :");
 		pgPrint(x,y++,setting.color[3],"  TURBO ON/OFF   :");
-		pgPrint(x,y++,setting.color[3],"  VSYNC ON/OFF   :");
+		pgPrint(x,y++,setting.color[3],"  REWIND         :");
+		//pgPrint(x,y++,setting.color[3],"  VSYNC ON/OFF   :");//davex: VSYNC removed as key
 		pgPrint(x,y++,setting.color[3],"  SOUND ON/OFF   :");
 		pgPrint(x,y++,setting.color[3],"  SCREEN SIZE    :");
 		pgPrint(x,y++,setting.color[3],"  QUICK SAVE     :");
@@ -618,6 +624,7 @@ void rin_keyconfig(void)
 			}
 			pgPrint(21,y,setting.color[3],msg);
 		}
+		
 		
 		if (crs_count < 15){
 			x = 2;
