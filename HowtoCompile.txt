@@ -1,0 +1,26 @@
+■コンパイル手順
+RINのコンパイルには以下のサイトのToolChainを使用しています。 
+http://psp-dev.org/pukiwiki/
+
+この３つのファイルのインストールが必要です。
+・psp-binutils-2.16.tar.bz2
+・psp-gcc-4.0.0.tar.bz2
+・psp-newlib-1.13.0-compiled-with-gcc-4.0.0.tar.bz2
+
+またライブラリとして zlib 1.2.2 と libpng 1.2.8 を使用しています。
+（ruka氏のunziplibも変更を加えて使用）
+http://www.zlib.net/
+http://www.libpng.org/pub/png/libpng.html
+
+ライブラリのソースをlibフォルダ内の所定の場所に、
+既にあるファイルを上書きせずに解凍してください。
+あとは libpng.a、zlib.a、unziplib.a をコンパイルし、
+libフォルダにコピーしてください。
+
+これでRINのコンパイルが通るはずです。
+
+■補足
+http://www.oopo.net/consoledev/
+のpsptoolchainは、速度が少し低下してしまったので
+やむをえず現時点では使用していません。
+

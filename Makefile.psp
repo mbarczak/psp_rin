@@ -1,0 +1,13 @@
+#C-Programs
+AR = psp-ar
+CC = psp-gcc
+LD = psp-gcc
+STRIP = psp-strip
+RM= rm -f
+RMDIR= rm -rf
+MKDIR= @mkdir -p
+
+#Compiler Flags
+ARCHFLAGS=-mgp32 -mlong32 -msingle-float -mabi=eabi 
+CFLAGS= -Wall -O3 -fomit-frame-pointer $(ARCHFLAGS)
+LDFLAGS=-nostartfiles -Wl,-Ttext=0x08900000
