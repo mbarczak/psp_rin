@@ -1,0 +1,16 @@
+*.o
+eboot.pbp
+out
+outp
+param.sfo
+lib/libpng128
+lib/zlib122
+
+# unignored files,modified by RIN creators
+!/lib/zlib122/gzio.c
+!/lib/zlib122/Makefile
+
+!/lib/libpng128/Makefile
+!/lib/libpng128/pngrio.c
+!/lib/libpng128/pngconf.h
+!/lib/libpng128/pngwio.c

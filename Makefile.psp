@@ -10,4 +10,5 @@ MKDIR= @mkdir -p
 #Compiler Flags
 ARCHFLAGS=-mgp32 -mlong32 -msingle-float -mabi=eabi 
 CFLAGS= -Wall -O3 -fomit-frame-pointer $(ARCHFLAGS)
-LDFLAGS=-nostartfiles -Wl,-Ttext=0x08900000
+LDFLAGS=-nostartfiles
+#LDFLAGS=-nostartfiles -Wl,-Ttext=0x09900000
