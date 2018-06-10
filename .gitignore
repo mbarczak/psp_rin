@@ -14,3 +14,6 @@ lib/zlib122
 !/lib/libpng128/pngrio.c
 !/lib/libpng128/pngconf.h
 !/lib/libpng128/pngwio.c
+
+/cmake-build-debug/
+.idea/workspace.xml
