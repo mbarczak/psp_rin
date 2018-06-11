@@ -206,14 +206,14 @@ void SJISCopy(SceIoDirent *a, unsigned char *file)
 {
 	unsigned char ca;
 	int i;
-	int len=strlen(a->name);
+	int len=strlen(a->d_name);
 	
 	for(i=0;i<=len;i++){
-		ca = a->name[i];
+		ca = a->d_name[i];
 		if (((0x81 <= ca)&&(ca <= 0x9f))
 		|| ((0xe0 <= ca)&&(ca <= 0xef))){
 			file[i++] = ca;
-			file[i] = a->name[i];
+			file[i] = a->d_name[i];
 		}
 		else{
 			if(ca>='a' && ca<='z') ca-=0x20;
@@ -229,7 +229,7 @@ int cmpFile(SceIoDirent *a, SceIoDirent *b)
 	unsigned char ca, cb;
 	int i, n, ret;
 
-	if(a->type==b->type){
+	if(a->d_stat.st_attr==b->d_stat.st_attr){
 		SJISCopy(a, file1);
 		SJISCopy(b, file2);
 		n=strlen((char*)file1);
@@ -241,7 +241,7 @@ int cmpFile(SceIoDirent *a, SceIoDirent *b)
 		return 0;
 	}
 	
-	if(a->type & TYPE_DIR)	return -1;
+	if(a->d_stat.st_attr & FIO_S_IFDIR)	return -1;
 	else					return 1;
 }
 // AC add end
@@ -275,8 +275,8 @@ void getDir(const char *path, u32 ext) {
 	nfiles = 0;
 	
 	if(strcmp(path,"ms0:/")){
-		strcpy(files[0].name,"..");
-		files[0].type = TYPE_DIR;
+		strcpy(files[0].d_name,"..");
+		files[0].d_stat.st_attr = FIO_S_IFDIR;
 		sortfiles[0] = files;
 		nfiles = 1;
 		b=1;
@@ -287,12 +287,12 @@ void getDir(const char *path, u32 ext) {
 	while(nfiles<MAX_ENTRY){
 		memset(&files[nfiles], 0x00, sizeof(SceIoDirent));
 		if(sceIoDread(fd, &files[nfiles])<=0) break;
-		if(files[nfiles].name[0] == '.') continue;
-		if(files[nfiles].type == TYPE_DIR){
-			strcat(files[nfiles].name, "/");
+		if(files[nfiles].d_name[0] == '.') continue;
+		if(files[nfiles].d_stat.st_attr == FIO_S_IFDIR){
+			strcat(files[nfiles].d_name, "/");
 			sortfiles[nfiles] = files + nfiles;
 			nfiles++;
-		}else if(getExtId(files[nfiles].name) & ext){
+		}else if(getExtId(files[nfiles].d_name) & ext){
 			sortfiles[nfiles] = files + nfiles;
 			nfiles++;
 		}
@@ -312,7 +312,7 @@ int getZipDirCallback(int nCallbackId, unsigned long ulExtractSize, unsigned lon
 	switch(nCallbackId) {
 	case UZCB_FIND_FILE:
 		if(getExtId(pszFileName)==EXT_GB){
-			strcpy(zip_files[zip_nfiles].name, pszFileName);
+			strcpy(zip_files[zip_nfiles].d_name, pszFileName);
 			zip_sortfiles[zip_nfiles] = zip_files + zip_nfiles;
 			zip_nfiles++;
 		}
@@ -350,22 +350,22 @@ void getZipDir(const char *path)
 	char *p;
 	int i, len;
 	
-	strcpy(files[0].name,"..");
-	files[0].type = TYPE_DIR;
+	strcpy(files[0].d_name,"..");
+	files[0].d_stat.st_attr = FIO_S_IFDIR;
 	sortfiles[0] = files;
 	nfiles = 1;
 	
 	len = strlen(path);
 	for(i=0; i<zip_nfiles; i++){
-		if(strncmp(zip_sortfiles[i]->name,path,len)) continue;
-		strcpy(files[nfiles].name,zip_sortfiles[i]->name + len);
-		p = strchr(files[nfiles].name, '/');
+		if(strncmp(zip_sortfiles[i]->d_name,path,len)) continue;
+		strcpy(files[nfiles].d_name,zip_sortfiles[i]->d_name + len);
+		p = strchr(files[nfiles].d_name, '/');
 		if(p){
 			*(p+1) = 0;
-			if(!strcmp(files[nfiles].name,files[nfiles-1].name)) continue;
-			files[nfiles].type = TYPE_DIR;
+			if(!strcmp(files[nfiles].d_name,files[nfiles-1].d_name)) continue;
+			files[nfiles].d_stat.st_attr = FIO_S_IFDIR;
 		}else{
-			files[nfiles].type = TYPE_FILE;
+			files[nfiles].d_stat.st_attr = FIO_S_IFREG;
 		}
 		sortfiles[nfiles] = files + nfiles;
 		nfiles++;
@@ -396,7 +396,7 @@ int getFilePath(char *fullpath, u32 ext)
 
 	if (tmp[0]){
 		for(i=0; i<nfiles; i++){
-			if (!stricmp(sortfiles[i]->name,tmp)){
+			if (!stricmp(sortfiles[i]->d_name,tmp)){
 				sel = i;
 				top = i-3;
 				break;
@@ -409,15 +409,15 @@ int getFilePath(char *fullpath, u32 ext)
 		if(new_pad)
 			filer_msg[0]=0;
 		if(new_pad & CTRL_CIRCLE){
-			if(sortfiles[sel]->type == TYPE_DIR){
-				if(!strcmp(sortfiles[sel]->name,"..")){
+			if(sortfiles[sel]->d_stat.st_attr == FIO_S_IFDIR){
+				if(!strcmp(sortfiles[sel]->d_name,"..")){
 					up=1;
 				}else{
 					if(inzip){
-						strcat(path_inzip,sortfiles[sel]->name);
+						strcat(path_inzip,sortfiles[sel]->d_name);
 						getZipDir(path_inzip);
 					}else{
-						strcat(path,sortfiles[sel]->name);
+						strcat(path,sortfiles[sel]->d_name);
 						getDir(path, ext);
 					}
 					sel=0;
@@ -425,11 +425,11 @@ int getFilePath(char *fullpath, u32 ext)
 			}else{
 				if(!inzip){
 					strcpy(tmp,path);
-					strcat(tmp,sortfiles[sel]->name);
+					strcat(tmp,sortfiles[sel]->d_name);
 					if (getExtId(tmp)==EXT_ZIP){
 						getZipDirAll(tmp);
 						if(zip_nfiles!=1){
-							strcat(path,sortfiles[sel]->name);
+							strcat(path,sortfiles[sel]->d_name);
 							getZipDir(path_inzip);
 							sel=0;
 							inzip=1;
@@ -443,16 +443,16 @@ int getFilePath(char *fullpath, u32 ext)
 		}else if(new_pad & CTRL_CROSS){
 			return 0;
 		}else if(new_pad & CTRL_SELECT){
-			if(!inzip && sortfiles[sel]->type == TYPE_FILE){
+			if(!inzip && sortfiles[sel]->d_stat.st_attr == FIO_S_IFREG){
 				strcpy(tmp,"\"");
-				strcat(tmp,sortfiles[sel]->name);
+				strcat(tmp,sortfiles[sel]->d_name);
 				strcat(tmp,"\"\n\nRemove?");
 				if(rin_MessageBox(tmp,1)){
 					strcpy(tmp, path);
-					strcat(tmp, sortfiles[sel]->name);
+					strcat(tmp, sortfiles[sel]->d_name);
 					if(sceIoRemove(tmp)>=0){
 						strcpy(filer_msg,"Removed \"");
-						strcat(filer_msg,sortfiles[sel]->name);
+						strcat(filer_msg,sortfiles[sel]->d_name);
 						strcat(filer_msg,"\"");
 						getDir(path, ext);
 					}
@@ -472,10 +472,10 @@ int getFilePath(char *fullpath, u32 ext)
 		
 		if(up){
 			oldDir[0]=0;
-			oldDirType = TYPE_DIR;
+			oldDirType = FIO_S_IFDIR;
 			if(inzip){
 				if(path_inzip[0]==0){
-					oldDirType = TYPE_FILE;
+					oldDirType = FIO_S_IFREG;
 					inzip=0;
 				}else{
 					path_inzip[strlen(path_inzip)-1]=0;
@@ -491,19 +491,19 @@ int getFilePath(char *fullpath, u32 ext)
 				}
 			}
 			if(strcmp(path,"ms0:/") && !inzip){
-				if(oldDirType==TYPE_DIR)
+				if(oldDirType==FIO_S_IFDIR)
 					path[strlen(path)-1]=0;
 				p=strrchr(path,'/')+1;
 				strcpy(oldDir,p);
-				if(oldDirType==TYPE_DIR)
+				if(oldDirType==FIO_S_IFDIR)
 					strcat(oldDir,"/");
 				*p=0;
 				getDir(path, ext);
 				sel=0;
 			}
 			for(i=0; i<nfiles; i++) {
-				if(oldDirType==sortfiles[i]->type
-				&& !strcmp(oldDir, sortfiles[i]->name)) {
+				if(oldDirType==sortfiles[i]->d_stat.st_attr
+				&& !strcmp(oldDir, sortfiles[i]->d_name)) {
 					sel=i;
 					top=sel-3;
 					break;
@@ -536,7 +536,7 @@ int getFilePath(char *fullpath, u32 ext)
 		x=28; y=32;
 		for(i=0; i<rows; i++){
 			if(top+i >= nfiles) break;
-			mh_print(x, y, sortfiles[top+i]->name, setting.color[top+i==sel?2:3]);
+			mh_print(x, y, sortfiles[top+i]->d_name, setting.color[top+i==sel?2:3]);
 			y+=10;
 		}
 		
@@ -544,6 +544,6 @@ int getFilePath(char *fullpath, u32 ext)
 	}
 	
 	strcpy(fullpath, path);
-	strcat(inzip?path_inzip:fullpath, sortfiles[sel]->name);
+	strcat(inzip?path_inzip:fullpath, sortfiles[sel]->d_name);
 	return 1;
 }

@@ -23,7 +23,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "gb_types.h"
-#include "../syscall.h"
+//#include "syscall.h"
+#include <pspiofilemgr.h>
 #include "../renderer.h"
 #include "../lib/zlib.h"
 

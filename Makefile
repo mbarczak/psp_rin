@@ -1,40 +1,27 @@
 #DEFS += -DUSE_GPU
 #DEFS += -DDEBUG
-
-PSPSDK=$(shell psp-config --pspsdk-path)
-
-PSPDEV=$(shell psp-config --pspdev-path)/bin
-INCLUDES=$(PSPSDK)/include
-
-
-PBP = EBOOT.PBP
-BINARY = out
-OBJS = startup.o gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
+TARGET		= hello_world
+OBJS = gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 	gbcore/rom.o gbcore/mbc.o gbcore/apu.o gbcore/cheat.o \
 	main.o pg.o renderer.o rewind.o menu.o filer.o sound.o saveload.o image.o gz.o \
 	syscall.o
-LIBS = -L/pspdev/psp/sdk/lib lib/unziplib.a lib/libpng.a lib/libz.a -lc -lpspnet_inet -lpspuser
 
-all: $(PBP)
 
-$(PBP): $(BINARY)
-	#outpatch
-	psp-fixup-imports -o outp out
-	#elf2pbp out "RIN GB/GBC Emulator"
-	mksfo "Rin 1.32 RM" param.sfo
-	pack-pbp eboot.pbp param.sfo ICON0.PNG NULL NULL NULL NULL outp NULL
+INCDIR		=
 
-$(BINARY): $(OBJS)
-	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
-	$(STRIP) $(BINARY)
+ARCHFLAGS=-mgp32 -mlong32 -msingle-float -mabi=eabi
+CFLAGS= -Wall -O3 -fomit-frame-pointer $(ARCHFLAGS)
+CXXFLAGS	= $(CFLAGS) -fno-exceptions -fno-rtti
+ASFLAGS	= $(CFLAGS)
 
-%.o: %.c
-	$(CC) $(DEFS) $(INCLUDES) $(CFLAGS) -c $< -o $@
+LIBDIR		=
+LDFLAGS	=
+LIBS = lib/unziplib.a lib/libpng.a lib/libz.a -lc -lpspnet_inet -lpspuser -lpsppower -lpspaudio -lpsprtc
 
-%.o: %.S
-	$(CC) $(DEFS) $(ARCHFLAGS) -c $< -o $@
+BUILD_PRX = 0
 
-clean:
-	$(RM) *.o *.map out outp param.sfo gbcore/*.o
+EXTRA_TARGETS	= EBOOT.PBP
+PSP_EBOOT_TITLE= Hello World
 
-include Makefile.psp
+PSPSDK	= $(shell psp-config --pspsdk-path)
+include $(PSPSDK)/lib/build.mak

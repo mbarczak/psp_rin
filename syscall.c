@@ -8,7 +8,8 @@
 #include <errno.h>
 #include <fcntl.h>
 //#include <unistd.h>
-#include "syscall.h"
+//#include "syscall.h"
+#include "main.h"
 
 char cwd[MAX_PATH]={0};
 
@@ -50,31 +51,31 @@ static inline int fdcnv(int fd)
 	}
 }
 
-int open(const char *pathname, int flags, ...)
-{
-	return sceIoOpen(pathname, flags, 644);
-}
+//int open(const char *pathname, int flags, ...)
+//{
+//	return sceIoOpen(pathname, flags, 644);
+//}
+//
+//int close(int fd)
+//{
+//	fd = fdcnv(fd);
+//	if(fd<0) return -1;
+//	return sceIoClose(fd);
+//}
 
-int close(int fd)
-{
-	fd = fdcnv(fd);
-	if(fd<0) return -1;
-	return sceIoClose(fd);
-}
-
-long read(int fd, void *buf, size_t count)
-{
-	fd = fdcnv(fd);
-	if(fd<0) return -1;
-	return sceIoRead(fd, buf, count);
-}
-
-long write(int fd, const void *buf, size_t count)
-{
-	fd = fdcnv(fd);
-	if(fd<0) return -1;
-	return sceIoWrite(fd, (void*)buf, count);
-}
+//long read(int fd, void *buf, size_t count)
+//{
+//	fd = fdcnv(fd);
+//	if(fd<0) return -1;
+//	return sceIoRead(fd, buf, count);
+//}
+//
+//long write(int fd, const void *buf, size_t count)
+//{
+//	fd = fdcnv(fd);
+//	if(fd<0) return -1;
+//	return sceIoWrite(fd, (void*)buf, count);
+//}
 
 off_t lseek(int fd, off_t offset, int dir)
 {

@@ -17,3 +17,6 @@ lib/zlib122
 
 /cmake-build-debug/
 .idea/workspace.xml
+/pspdev/
+/hello_world.prx
+/hello_world.elf

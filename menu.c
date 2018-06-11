@@ -918,7 +918,7 @@ void rin_findState(int nState[], int nThumb[])
 		get_state_path(i,tmp);
 		nState[i]=-1;
 		for(j=0; j<nfiles; j++){
-			if(!stricmp(p,files[j].name)){
+			if(!stricmp(p,files[j].d_name)){
 				nState[i] = j;
 				break;
 			}
@@ -927,7 +927,7 @@ void rin_findState(int nState[], int nThumb[])
 		if (nState[i]<0){
 			strcat(p, ".gz");
 			for(j=0; j<nfiles; j++){
-				if(!stricmp(p,files[j].name)){
+				if(!stricmp(p,files[j].d_name)){
 					nState[i] = j;
 					break;
 				}
@@ -937,7 +937,7 @@ void rin_findState(int nState[], int nThumb[])
 		get_thumb_path(i,tmp);
 		nThumb[i]=-1;
 		for(j=0; j<nfiles; j++){
-			if(!stricmp(p,files[j].name)){
+			if(!stricmp(p,files[j].d_name)){
 				nThumb[i] = j;
 				break;
 			}
@@ -947,7 +947,7 @@ void rin_findState(int nState[], int nThumb[])
 
 		*strrchr(tmp, '.') = 0;
 		for(j=0; j<nfiles; j++){
-			if(!stricmp(p,files[j].name)){
+			if(!stricmp(p,files[j].d_name)){
 				nThumb[i] = j;
 				break;
 			}
@@ -1015,7 +1015,7 @@ int rin_stateslot(int type)
 					memcpy(thumb_w,thumb_tmp,sizeof(thumb_w));
 			}
 			else if (nState[sel]>=0 && nThumb[sel]>=0){
-				p = strrchr(files[nThumb[sel]].name, '.');
+				p = strrchr(files[nThumb[sel]].d_name, '.');
 				if(!stricmp(p, ".png"))
 					ret = load_thumb(sel,thumb_w,sizeof(thumb_w));
 				else
@@ -1068,12 +1068,12 @@ int rin_stateslot(int type)
 				sprintf(msg,"%d - None", i);
 			}else{
 				sprintf(msg, "%d - %04d/%02d/%02d %02d:%02d:%02d", i,
-					files[nState[i]].mtime.year,
-					files[nState[i]].mtime.mon,
-					files[nState[i]].mtime.mday,
-					files[nState[i]].mtime.hour,
-					files[nState[i]].mtime.min,
-					files[nState[i]].mtime.sec);
+					files[nState[i]].d_stat.st_mtime.year,
+					files[nState[i]].d_stat.st_mtime.month,
+					files[nState[i]].d_stat.st_mtime.day,
+					files[nState[i]].d_stat.st_mtime.hour,
+					files[nState[i]].d_stat.st_mtime.minute,
+					files[nState[i]].d_stat.st_mtime.second);
 			}
 			pgPrint(x,y++,setting.color[i==sel?2:3],msg);
 		}
@@ -1081,11 +1081,11 @@ int rin_stateslot(int type)
 		if (state_tmp){
 			sprintf(msg, "TMP:%04d/%02d/%02d %02d:%02d:%02d",
 				state_tmp_time.year,
-				state_tmp_time.mon,
-				state_tmp_time.mday,
+				state_tmp_time.month,
+				state_tmp_time.day,
 				state_tmp_time.hour,
-				state_tmp_time.min,
-				state_tmp_time.sec);
+				state_tmp_time.minute,
+				state_tmp_time.second);
 		}else
 			strcpy(msg,"TMP:None");
 		pgPrint(x,y++,setting.color[i==sel?2:3],msg);

@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "syscall.h"
+//#include "syscall.h"
+#include <main.h>
 #include "pg.h"
 #include "gbcore/gb.h"
 
@@ -912,7 +913,7 @@ int pgaInit()
 	strcpy(str,"pgasnd0");
 	for (i=0; i<PGA_CHANNELS; i++) {
 		str[6]='0'+i;
-		pga_threadhandle[i]=sceKernelCreateThread(str,(pg_threadfunc_t)&pga_channel_thread,0x12,0x10000,0,NULL);
+		pga_threadhandle[i]=sceKernelCreateThread(str,(SceKernelThreadEntry)&pga_channel_thread,0x12,0x10000,0,NULL);
 		if (pga_threadhandle[i]<0) {
 			pga_threadhandle[i]=-1;
 			failed=1;

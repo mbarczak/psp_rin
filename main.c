@@ -1,5 +1,13 @@
 #include "main.h"
 #include "rewind.h" //davex
+//https://ameblo.jp/pspdevblog/theme8-10001513763.html
+
+#define VERS    1
+#define REVS    0
+
+PSP_MODULE_INFO("Rin 1.32 RM", PSP_MODULE_USER, VERS, REVS);
+PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER);
+PSP_HEAP_SIZE_MAX();
 
 volatile int bSleep=0;
 int bMenu=0;
@@ -46,7 +54,7 @@ int exit_callback(void)
 void power_callback(int unknown, int pwrflags)
 {
 	//if(pwrflags & (POWER_CB_SUSPEND|POWER_CB_STANDBY)){
-	if(pwrflags & POWER_CB_POWER){
+	if(pwrflags & PSP_POWER_CB_AC_POWER){
 		if (!bSleep){
 			bSleep=1;
 
@@ -61,7 +69,7 @@ void power_callback(int unknown, int pwrflags)
 			sceKernelPowerUnlock(0);
 		}
 	}
-	if(pwrflags & POWER_CB_BATLOW){
+	if(pwrflags & PSP_POWER_CB_BATTERY_LOW){
 		//renderer_set_msg("PSP Battery is Low!");
 		if (!bSleep){
 			bSleep=1;
@@ -80,7 +88,7 @@ void power_callback(int unknown, int pwrflags)
 			scePowerRequestSuspend(); 
 		}
 	}
-	if(pwrflags & POWER_CB_RESCOMP){
+	if(pwrflags & PSP_POWER_CB_RESUME_COMPLETE){
 		bSleep=0;
 	}
 
@@ -311,7 +319,7 @@ void mainloop(void)
 	}
 }
 
-int xmain(int argc, char *argv)
+int main(int argc, char *argv)
 {
 	int romsize, ramsize;
 	char *p, tmp[MAX_PATH];

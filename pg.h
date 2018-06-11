@@ -4,7 +4,8 @@
 #define PG_H
 
 #include <string.h>
-#include "syscall.h"
+//#include "syscall.h"
+#include <main.h>
 
 #define RGB(r,g,b) ((((b>>3) & 0x1F)<<10)|(((g>>3) & 0x1F)<<5)|(((r>>3) & 0x1F)<<0)|0x8000)
 

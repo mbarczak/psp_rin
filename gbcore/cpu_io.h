@@ -1,3 +1,6 @@
+#include <psputils.h>
+#include <pspiofilemgr.h>
+
 //long配列をコピー。配列境界は4バイトアラインされている必要あり
 inline void _memcpy4x(void *d, void *s, unsigned long c)
 {
@@ -784,7 +787,7 @@ static void cpu_io_write_56( word adr,byte dat )
 	cg_regs.RP=dat;
 	if ((cg_regs.RP&0xC0)==0xC0){
 		if (rp_fd<0){
-			rp_fd = sceIoOpen("irda0:",SCE_O_RDWR, 777);
+			rp_fd = sceIoOpen("irda0:",PSP_O_RDWR, 777);
 			rp_data = sceIoRead(rp_fd, &rp_data, 1);
 			rp_time = sceKernelLibcClock();
 		}

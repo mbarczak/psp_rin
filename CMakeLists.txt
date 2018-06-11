@@ -21,8 +21,9 @@ MACRO(HEADER_DIRECTORIES return_list)
 ENDMACRO()
 
 set(return_list ".")
-HEADER_DIRECTORIES(${return_list})
-include_directories(${return_list})
+HEADER_DIRECTORIES(${return_list} pspdev/psp/sdk/include)
+include_directories(${return_list} pspdev/psp/sdk/include)
+
 
 add_executable(rin ${all_src})
 set_target_properties(rin PROPERTIES LINKER_LANGUAGE CXX)
