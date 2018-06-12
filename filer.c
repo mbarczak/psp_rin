@@ -241,7 +241,7 @@ int cmpFile(SceIoDirent *a, SceIoDirent *b)
 		return 0;
 	}
 	
-	if(a->d_stat.st_attr & FIO_S_IFDIR)	return -1;
+	if(a->d_stat.st_attr & FIO_SO_IFDIR)	return -1;
 	else					return 1;
 }
 // AC add end
@@ -276,7 +276,7 @@ void getDir(const char *path, u32 ext) {
 	
 	if(strcmp(path,"ms0:/")){
 		strcpy(files[0].d_name,"..");
-		files[0].d_stat.st_attr = FIO_S_IFDIR;
+		files[0].d_stat.st_attr = FIO_SO_IFDIR;
 		sortfiles[0] = files;
 		nfiles = 1;
 		b=1;
@@ -288,7 +288,7 @@ void getDir(const char *path, u32 ext) {
 		memset(&files[nfiles], 0x00, sizeof(SceIoDirent));
 		if(sceIoDread(fd, &files[nfiles])<=0) break;
 		if(files[nfiles].d_name[0] == '.') continue;
-		if(files[nfiles].d_stat.st_attr == FIO_S_IFDIR){
+		if(files[nfiles].d_stat.st_attr == FIO_SO_IFDIR){
 			strcat(files[nfiles].d_name, "/");
 			sortfiles[nfiles] = files + nfiles;
 			nfiles++;
@@ -351,7 +351,7 @@ void getZipDir(const char *path)
 	int i, len;
 	
 	strcpy(files[0].d_name,"..");
-	files[0].d_stat.st_attr = FIO_S_IFDIR;
+	files[0].d_stat.st_attr = FIO_SO_IFDIR;
 	sortfiles[0] = files;
 	nfiles = 1;
 	
@@ -363,9 +363,9 @@ void getZipDir(const char *path)
 		if(p){
 			*(p+1) = 0;
 			if(!strcmp(files[nfiles].d_name,files[nfiles-1].d_name)) continue;
-			files[nfiles].d_stat.st_attr = FIO_S_IFDIR;
+			files[nfiles].d_stat.st_attr = FIO_SO_IFDIR;
 		}else{
-			files[nfiles].d_stat.st_attr = FIO_S_IFREG;
+			files[nfiles].d_stat.st_attr = FIO_SO_IFREG;
 		}
 		sortfiles[nfiles] = files + nfiles;
 		nfiles++;
@@ -409,7 +409,7 @@ int getFilePath(char *fullpath, u32 ext)
 		if(new_pad)
 			filer_msg[0]=0;
 		if(new_pad & CTRL_CIRCLE){
-			if(sortfiles[sel]->d_stat.st_attr == FIO_S_IFDIR){
+			if(sortfiles[sel]->d_stat.st_attr == FIO_SO_IFDIR){
 				if(!strcmp(sortfiles[sel]->d_name,"..")){
 					up=1;
 				}else{
@@ -443,7 +443,7 @@ int getFilePath(char *fullpath, u32 ext)
 		}else if(new_pad & CTRL_CROSS){
 			return 0;
 		}else if(new_pad & CTRL_SELECT){
-			if(!inzip && sortfiles[sel]->d_stat.st_attr == FIO_S_IFREG){
+			if(!inzip && sortfiles[sel]->d_stat.st_attr == FIO_SO_IFREG){
 				strcpy(tmp,"\"");
 				strcat(tmp,sortfiles[sel]->d_name);
 				strcat(tmp,"\"\n\nRemove?");
@@ -472,10 +472,10 @@ int getFilePath(char *fullpath, u32 ext)
 		
 		if(up){
 			oldDir[0]=0;
-			oldDirType = FIO_S_IFDIR;
+			oldDirType = FIO_SO_IFDIR;
 			if(inzip){
 				if(path_inzip[0]==0){
-					oldDirType = FIO_S_IFREG;
+					oldDirType = FIO_SO_IFREG;
 					inzip=0;
 				}else{
 					path_inzip[strlen(path_inzip)-1]=0;
@@ -491,11 +491,11 @@ int getFilePath(char *fullpath, u32 ext)
 				}
 			}
 			if(strcmp(path,"ms0:/") && !inzip){
-				if(oldDirType==FIO_S_IFDIR)
+				if(oldDirType==FIO_SO_IFDIR)
 					path[strlen(path)-1]=0;
 				p=strrchr(path,'/')+1;
 				strcpy(oldDir,p);
-				if(oldDirType==FIO_S_IFDIR)
+				if(oldDirType==FIO_SO_IFDIR)
 					strcat(oldDir,"/");
 				*p=0;
 				getDir(path, ext);

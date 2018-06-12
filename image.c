@@ -57,6 +57,11 @@ int write_png(char *path, const byte *in, unsigned int width, unsigned int heigh
     return 1;
 }
 
+static int png_check_sig_custom(png_bytep sig, int num)
+{
+	return ((int)!png_sig_cmp(sig, (png_size_t)0, (png_size_t)num));
+}
+
 int read_png(char *path, unsigned short *out, size_t outlen)
 {
 	FILE *fp = fopen(path,"rb");
@@ -70,7 +75,7 @@ int read_png(char *path, unsigned short *out, size_t outlen)
 		return 0;
 	}
 
-	if (!png_check_sig( signature, nSigSize )){
+	if (!png_check_sig_custom( signature, nSigSize )){
 		fclose(fp);
 		return 0;
 	}

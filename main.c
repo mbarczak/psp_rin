@@ -319,14 +319,14 @@ void mainloop(void)
 	}
 }
 
-int main(int argc, char *argv)
+int main(int argc, char *argv[])
 {
 	int romsize, ramsize;
 	char *p, tmp[MAX_PATH];
 	
 	pgInit();
 
-	strcpy(RinPath, argv);
+	strcpy(RinPath, argv[0]);
 	p = strrchr(RinPath, '/');
 	*++p = 0;
 	sprintf(CheatPath, "%sCHEAT/", RinPath);
