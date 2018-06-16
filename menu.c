@@ -219,7 +219,7 @@ void rin_frame(const char *msg0, const char *msg1)
 		pgFillvram(setting.color[0]);
 
 	// バージョンナンバー
-	sprintf(tmp, "■ Papiex %s ■", VERRIN);
+	sprintf(tmp, "■ ＲＩＮ Ver%s RM mod v2 ■", VERRIN);
 	mh_print(465-strlen(tmp)*5, 0, tmp, setting.color[1]);
 
 	// メッセージなど
