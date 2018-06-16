@@ -153,9 +153,8 @@ byte cheat_write(word adr, byte dat)
 
 int hex2n(char c)
 {
-//	c = toupper(c);
-//	return (isalpha(c)?(c-'A'+10):(c-'0'));
-	return 0;
+	c = toupper(c);
+	return (isalpha(c)?(c-'A'+10):(c-'0'));
 }
 
 int cheat_load(FILE *file)

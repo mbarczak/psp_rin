@@ -8,7 +8,7 @@ OBJS = gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 INCDIR		=
 
 ARCHFLAGS =-mgp32 -mlong32 -msingle-float -mabi=eabi
-CFLAGS = -Wall -O3 -fomit-frame-pointer $(ARCHFLAGS)
+CFLAGS = -Wall -O3 -fomit-frame-pointer $(ARCHFLAGS) -G3
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS	= $(CFLAGS)
 
@@ -18,8 +18,9 @@ LIBS = lib/unziplib.a lib/libpng.a -lz -lc -lm -lpspnet_inet -lpspuser -lpsppowe
 
 BUILD_PRX = 0
 
-EXTRA_TARGETS	= EBOOT.PBP
-PSP_EBOOT_TITLE= Rin 1.32 RM v2
+EXTRA_TARGETS = EBOOT.PBP
+PSP_EBOOT_ICON = ICON0.PNG
+PSP_EBOOT_TITLE = Rin 1.32 RM v2
 
 PSPSDK	= $(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak
