@@ -3,8 +3,7 @@
 TARGET = papiex_rin
 OBJS = gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 	gbcore/rom.o gbcore/mbc.o gbcore/apu.o gbcore/cheat.o \
-	main.o pg.o renderer.o rewind.o menu.o filer.o sound.o saveload.o image.o gz.o \
-	syscall.o
+	main.o pg.o renderer.o rewind.o menu.o filer.o sound.o saveload.o image.o gz.o
 
 
 INCDIR		=
@@ -16,7 +15,7 @@ ASFLAGS	= $(CFLAGS)
 
 LIBDIR		=
 LDFLAGS	=
-LIBS = lib/unziplib.a lib/libpng.a lib/libz.a -lc -lpspnet_inet -lpspuser -lpsppower -lpspaudio -lpsprtc
+LIBS = lib/unziplib.a -lpng -lz -lc -lm -lpspnet_inet -lpspuser -lpsppower -lpspaudio -lpsprtc
 
 BUILD_PRX = 1
 
@@ -30,4 +29,5 @@ DST = /dst
 SRC = ${TARGET}.prx
 install :
 	rm -f ${DST}/${SRC}
-	cp ./${SRC} ${DST}
+	cp *.prx ${DST}
+	chmod 777 ${DST}/*.prx
