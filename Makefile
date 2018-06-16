@@ -1,6 +1,6 @@
 #DEFS += -DUSE_GPU
 #DEFS += -DDEBUG
-TARGET		= hello_world
+TARGET = papiex_rin
 OBJS = gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 	gbcore/rom.o gbcore/mbc.o gbcore/apu.o gbcore/cheat.o \
 	main.o pg.o renderer.o rewind.o menu.o filer.o sound.o saveload.o image.o gz.o \
@@ -18,10 +18,16 @@ LIBDIR		=
 LDFLAGS	=
 LIBS = lib/unziplib.a lib/libpng.a lib/libz.a -lc -lpspnet_inet -lpspuser -lpsppower -lpspaudio -lpsprtc
 
-BUILD_PRX = 0
+BUILD_PRX = 1
 
 EXTRA_TARGETS	= EBOOT.PBP
-PSP_EBOOT_TITLE= Hello World
+PSP_EBOOT_TITLE= Papiex Rin
 
 PSPSDK	= $(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak
+
+DST = /dst
+SRC = ${TARGET}.prx
+install :
+	rm -f ${DST}/${SRC}
+	cp ./${SRC} ${DST}

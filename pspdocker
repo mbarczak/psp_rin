@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+SRC=$PWD
+DST=/home/pxscene/git/psp_rin_release/RIN_1_32_RM/
+
+docker run \
+    -it \
+    --rm \
+    -v "$SRC:/src" \
+    -v "$DST:/dst" \
+    registry.gitlab.220v.eu/maciek/psp_rin/tick_pspdev:v1 \
+    bash -c "$*"
