@@ -2,9 +2,16 @@
 <project version="4">
   <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$" />
   <component name="CidrRootsConfiguration">
+    <sourceRoots>
+      <file path="$PROJECT_DIR$/pspdev/psp/include/libpng15" />
+    </sourceRoots>
     <libraryRoots>
       <file path="$PROJECT_DIR$/pspdev/psp/sdk/lib" />
     </libraryRoots>
+    <excludeRoots>
+      <file path="$PROJECT_DIR$/lib/libpng128" />
+      <file path="$PROJECT_DIR$/lib/zlib122" />
+    </excludeRoots>
   </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
