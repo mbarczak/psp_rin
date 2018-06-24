@@ -8,12 +8,12 @@ OBJS = gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 INCDIR		=
 
 ARCHFLAGS =-mgp32 -mlong32 -msingle-float -mabi=eabi
-CFLAGS = -Wall -O3 -fomit-frame-pointer $(ARCHFLAGS) -G3
+CFLAGS = -Wall -fomit-frame-pointer -O0 -ggdb -gdwarf-2 $(ARCHFLAGS) -G3
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS	= $(CFLAGS)
 
-LIBDIR		=
-LDFLAGS	=
+LIBDIR	=
+LDFLAGS	= 
 LIBS = lib/unziplib.a lib/libpng.a -lz -lc -lm -lpspnet_inet -lpspuser -lpsppower -lpspaudio -lpsprtc
 
 BUILD_PRX = 0
@@ -25,9 +25,12 @@ PSP_EBOOT_TITLE = Rin 1.32 RM v2
 PSPSDK	= $(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak
 
-DST = /dst
+DST = /home/pxscene/git/psp_rin_release/RIN_1_32_RM/
 SRC = ${TARGET}.prx
 install :
 	rm -f ${DST}/${SRC}
-	cp *.prx ${DST}
-	chmod 777 ${DST}/*.prx
+	rm -f ${DST}/*.elf
+	#cp -f *.prx ${DST}
+	cp -f *.elf ${DST}
+	#chmod 777 ${DST}/*.prx
+	chmod 777 ${DST}/*.elf

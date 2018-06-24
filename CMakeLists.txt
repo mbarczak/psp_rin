@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 project(rin C CXX)
+include(/usr/local/pspdev/psp/share/cmake/PSP.cmake)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -21,8 +22,8 @@ MACRO(HEADER_DIRECTORIES return_list)
 ENDMACRO()
 
 set(return_list ".")
-HEADER_DIRECTORIES(${return_list} pspdev/psp/sdk/include)
-include_directories(${return_list} pspdev/psp/sdk/include)
+#HEADER_DIRECTORIES(${return_list} pspdev/psp/sdk/include)
+#include_directories(${return_list} pspdev/psp/sdk/include)
 
 
 
