@@ -1,4 +1,4 @@
-#include "lib/zlib.h"
+#include <zlib.h>
 //#include "syscall.h"
 #include "main.h"
 

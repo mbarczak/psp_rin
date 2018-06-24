@@ -26,7 +26,7 @@
 //#include "syscall.h"
 #include <pspiofilemgr.h>
 #include "../renderer.h"
-#include "../lib/zlib.h"
+#include <zlib.h>
 
 #define INT_VBLANK 1
 #define INT_LCDC 2

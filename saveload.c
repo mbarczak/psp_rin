@@ -3,7 +3,7 @@
 #include "main.h"
 #include "gz.h"
 #include "image.h"
-#include "lib/zlib.h"
+#include <zlib.h>
 
 uLong sram_crc;
 
