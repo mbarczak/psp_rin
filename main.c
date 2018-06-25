@@ -390,3 +390,30 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+static int checkIfButtonRepressed(){
+    int retVal = 0;
+    ctrl_data_t paddata;
+    sceCtrlPeekBufferPositive(&paddata, 1);
+    if((paddata.buttons & PSP_CTRL_LEFT)
+       && (paddata.buttons & PSP_CTRL_START))
+    {
+        retVal = 1;
+    }
+    return retVal;
+}
+
+void test_available_memory(void){
+	static int testNumber=0;
+#define MSG_LEN 255
+	static char tmp[MSG_LEN]={0};
+	ctrl_data_t paddata;
+	sceCtrlPeekBufferPositive(&paddata, 1);
+	if(checkIfButtonRepressed()){
+		snprintf(tmp,MSG_LEN,"!!Rewind test number : %d\n",testNumber);
+		printf(tmp);
+		testNumber++;
+        pgWaitVn(20);
+
+	}
+    pgPrintf(0,33,setting.color[3],tmp);
+}
