@@ -1,5 +1,8 @@
 #DEFS += -DUSE_GPU
 #DEFS += -DDEBUG
+MODE=REL
+#MODE=DBG
+
 TARGET = rin_rm
 OBJS = gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 	gbcore/rom.o gbcore/mbc.o gbcore/apu.o gbcore/cheat.o \
@@ -8,7 +11,14 @@ OBJS = gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 INCDIR		=
 
 ARCHFLAGS =-mgp32 -mlong32 -msingle-float -mabi=eabi
-CFLAGS = -Wall -fomit-frame-pointer -O0 -ggdb -gdwarf-2 $(ARCHFLAGS) -G3
+CFLAGS = -Wall -fomit-frame-pointer $(ARCHFLAGS) -G3
+
+ifeq ($(MODE),REL)
+CFLAGS += -O3
+else
+CFLAGS += -O0 -ggdb -gdwarf-2
+endif
+
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS	= $(CFLAGS)
 
