@@ -543,7 +543,6 @@ void pgScreenFrame(long mode,long frame)
 
 void pgScreenFlip()
 {
-    test_available_memory();
 	pg_showframe=(pg_showframe?0:1);
 	pg_drawframe=(pg_drawframe?0:1);
 	sceDisplaySetFrameBuf(pg_vramtop+(pg_showframe?FRAMESIZE:0),LINESIZE,PIXELSIZE,0);
