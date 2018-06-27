@@ -402,6 +402,25 @@ static int checkIfButtonRepressed(){
     return retVal;
 }
 
+static long checkAvailableMemoryBiggestSingleChunk(){
+	void* mem = NULL;
+	long size = 1024;
+	long incr = 1024;
+	while(mem = malloc(size)){
+		free(mem);
+		size += incr;
+	}
+	return size-incr;
+}
+
+static inline long byte2mb(long bytes){
+	return bytes/1024/1024;
+}
+
+static inline long byte2kb(long bytes){
+	return bytes/1024;
+}
+
 void test_available_memory(void){
 	static int testNumber=0;
 #define MSG_LEN 255
@@ -409,11 +428,12 @@ void test_available_memory(void){
 	ctrl_data_t paddata;
 	sceCtrlPeekBufferPositive(&paddata, 1);
 	if(checkIfButtonRepressed()){
-		snprintf(tmp,MSG_LEN,"!!Rewind test number : %d\n",testNumber);
+		long availBiggest = checkAvailableMemoryBiggestSingleChunk();
+		snprintf(tmp,MSG_LEN,"Mem test: %d,biggest chunk : %ld mb (%ld kb)\n",testNumber,byte2mb(availBiggest),byte2kb(availBiggest));
 		printf(tmp);
 		testNumber++;
         pgWaitVn(20);
 
 	}
-    pgPrintf(0,33,setting.color[3],tmp);
+    pgPrintf(0,33,RGB(255,0,0),tmp);
 }
