@@ -367,13 +367,8 @@ int main(int argc, char *argv[])
 			strcpy(filer_msg,"ROM Load Failed");
 			continue;
 		}
-		
-		if(org_gbtype==1)
-			renderer_set_msg("ROM TYPE:GB");
-		else if(org_gbtype==2)
-			renderer_set_msg("ROM TYPE:SGB");
-		else if(org_gbtype==3)
-			renderer_set_msg("ROM TYPE:GBC");
+
+		showMsgAboutLoadedRom();
 
 		break;
 	}

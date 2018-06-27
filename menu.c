@@ -1349,12 +1349,7 @@ void rin_menu(void)
 						continue;
 					}
 
-					if(org_gbtype==1)
-						renderer_set_msg("ROM TYPE:GB");
-					else if(org_gbtype==2)
-						renderer_set_msg("ROM TYPE:SGB");
-					else if(org_gbtype==3)
-						renderer_set_msg("ROM TYPE:GBC");
+					showMsgAboutLoadedRom();
 
 					free(state_tmp);
 					state_tmp = NULL;
@@ -1466,4 +1461,19 @@ void rin_menu(void)
 	if(render_msg_mode!=6)
 		render_msg_mode = 0;
 	border_uploaded = 2;
+}
+
+extern int num_rwnd_states;
+void showMsgAboutLoadedRom() {
+#define MAX_LEN 70
+#define MSG "ROM TYPE:%s, REWIND: going back %d steps available."
+    char tmp[MAX_LEN]={0};
+    if(org_gbtype == 1)
+        snprintf(tmp,MAX_LEN,MSG,"GB",num_rwnd_states);
+    else if (org_gbtype == 2)
+        snprintf(tmp,MAX_LEN,MSG,"SGB",num_rwnd_states);
+    else if (org_gbtype == 3)
+        snprintf(tmp,MAX_LEN,MSG,"GBC",num_rwnd_states);
+
+    renderer_set_msg(tmp);
 }

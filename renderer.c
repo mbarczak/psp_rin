@@ -167,7 +167,7 @@ void render_screen(void *buf)
 	
 	if(render_msg_mode>=3){
 		pgPrint_drawbg(0,33,0xffff,0,render_msg);
-		if (sceKernelLibcClock() > render_msg_time + 1000000)
+		if (sceKernelLibcClock() > render_msg_time + 2000000)
 			render_msg_mode=2;
 	}
 }

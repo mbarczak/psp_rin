@@ -62,5 +62,6 @@ void rin_menu(void);
 int rin_MessageBox(const char *msg, int type);
 int get_nShortcutKey(u32 buttons);
 void bgbright_change();
+void showMsgAboutLoadedRom();
 
 #endif
