@@ -60,16 +60,18 @@ void free_rewind_states(void){
 	struct rewind_state *now_state; 
 	
 	now_state = ptr_rewind_states;
-	prev_state = now_state->prev;
-	prev_state->next = NULL;
-	
-	while(1){
-		if ( now_state == NULL)
-			break;
-		next_state = now_state->next;
-		free(now_state->data );
-		free(now_state);
-		now_state = next_state;
+	if(ptr_rewind_states){
+        prev_state = now_state->prev;
+        prev_state->next = NULL;
+
+        while(1){
+            if ( now_state == NULL)
+                break;
+            next_state = now_state->next;
+            free(now_state->data );
+            free(now_state);
+            now_state = next_state;
+        }
 	}
 }
 

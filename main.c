@@ -146,7 +146,7 @@ void mainloop(void)
 	int line, turbo_bak=0;
 	
 	ctrl_data_t paddata;// davex: for rewind checking
-	allocate_rewind_states();
+//	allocate_rewind_states();
 	save_period_frames = 10;
 
 	for(;;) {

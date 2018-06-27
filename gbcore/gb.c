@@ -22,6 +22,7 @@
 
 #include "gb.h"
 #include "../menu.h"
+#include "../rewind.h"
 
 #define VFRAME_SIZE (SIZE_LINE*256*2)
 
@@ -139,6 +140,8 @@ bool gb_load_rom(byte *buf,int size,byte *ram,int ram_size)
 {
 	if (rom_load_rom(buf,size,ram,ram_size)){
 		gb_reset();
+		free_rewind_states();
+		allocate_rewind_states();
 		return true;
 	}
 	else
