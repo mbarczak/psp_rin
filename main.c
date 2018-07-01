@@ -409,6 +409,62 @@ static long checkAvailableMemoryBiggestSingleChunk(){
 	return size-incr;
 }
 
+typedef struct head{
+    void * mem;
+    struct head* next;
+} list;
+
+list* list_alloc(){
+    return calloc(1,sizeof(list));
+}
+
+void list_destroy(list** head){
+    if(*head){
+        list* iter = *head;
+        while(iter){
+           list* next = iter->next;
+           free(iter->mem);
+           free(iter);
+           iter = next;
+        }
+        (*head) = NULL;
+    }
+}
+
+list* list_add(list** head, void* mem){
+    if(head && (*head)){
+        list* elem = list_alloc();
+        if(elem){
+            elem->mem = mem;
+            elem->next = (*head);
+            (*head) = elem;
+        }
+        return (*head);
+    }
+    return NULL;
+}
+
+static long checkAvailableMemoryMixedChunks(){
+    long retval = 0L;
+    void* mem = NULL;
+    list* head = list_alloc();
+    long size = 1024*512;
+    int len = 0;
+
+    while(mem = malloc(size)){
+        if(!list_add(&head,mem)){
+            free(mem);
+            break;
+        }
+        else {
+            len++;
+        }
+    }
+    retval = len * size;
+    list_destroy(&head);
+    return retval;
+}
+
 static inline long byte2mb(long bytes){
 	return bytes/1024/1024;
 }
@@ -425,11 +481,13 @@ void test_available_memory(void){
 	sceCtrlPeekBufferPositive(&paddata, 1);
 	if(checkIfButtonRepressed()){
 		long availBiggest = checkAvailableMemoryBiggestSingleChunk();
-		snprintf(tmp,MSG_LEN,"Mem test: %d,biggest chunk : %ld mb (%ld kb)\n",testNumber,byte2mb(availBiggest),byte2kb(availBiggest));
+		long availMixed = checkAvailableMemoryMixedChunks();
+		snprintf(tmp,MSG_LEN,"Mem:%d,big chunk: %ld mb (%ld kb);small:%ld mb (%ld kb)\n",
+                 testNumber,byte2mb(availBiggest),byte2kb(availBiggest),byte2mb(availMixed),byte2kb(availMixed));
 		printf(tmp);
 		testNumber++;
         pgWaitVn(20);
 
 	}
-    pgPrintf(0,33,RGB(255,0,0),tmp);
+    pgPrintf(0,1,RGB(255,0,0),tmp);
 }
