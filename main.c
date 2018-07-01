@@ -51,7 +51,7 @@ int exit_callback(void)
 
 // 電源スイッチ操作時や不定期にコールバック。
 // この関数がまだ実行中でもサスペンド・スタンバイに入る可能性がある。
-void power_callback(int unknown, int pwrflags)
+int power_callback(int unknown, int pwrflags)
 {
 	//if(pwrflags & (POWER_CB_SUSPEND|POWER_CB_STANDBY)){
 	if(pwrflags & PSP_POWER_CB_AC_POWER){
@@ -94,8 +94,9 @@ void power_callback(int unknown, int pwrflags)
 
 	// コールバック関数の再登録
 	// （一度呼ばれたら再登録しておかないと次にコールバックされない）
-	int cbid = sceKernelCreateCallback("Power Callback", power_callback, NULL);
-	scePowerRegisterCallback(0, cbid);
+//	int cbid = sceKernelCreateCallback("Power Callback", power_callback, NULL);
+//	scePowerRegisterCallback(0, cbid);
+    return 0;
 }
 
 // ポーリング用スレッド
