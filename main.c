@@ -54,7 +54,7 @@ int exit_callback(void)
 int power_callback(int unknown, int pwrflags)
 {
 	//if(pwrflags & (POWER_CB_SUSPEND|POWER_CB_STANDBY)){
-	if(pwrflags & PSP_POWER_CB_AC_POWER){
+	if(pwrflags & PSP_POWER_CB_POWER_SWITCH){
 		if (!bSleep){
 			bSleep=1;
 
