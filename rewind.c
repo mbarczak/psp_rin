@@ -10,6 +10,7 @@ e-mail: efengeler@gmail.com
 int num_rwnd_states = 0;
 int rwnd_state_size = 0;
 const int TOTAL_REWIND_MEMORY = 5*1024*1024; //reserves 5 MB for rewind states
+int max_rewind_memory = 0;
 int g_rwnd_period = 0;
 
 struct rewind_state{
@@ -98,7 +99,7 @@ int read_rewind_state(void){
 }
 
 //Papiex : Rewind extension
-
+#ifdef MAX_MEMORY_ESTIMATION
 static int checkIfButtonRepressed(){
 	int retVal = 0;
 	ctrl_data_t paddata;
@@ -203,4 +204,11 @@ void test_available_memory(void){
 
 	}
 	pgPrintf(0,1,RGB(255,0,0),tmp);
+}
+#endif //MAX_MEMORY_ESTIMATION
+int establish_max_rewind_memory(void) {
+    long retval = TOTAL_REWIND_MEMORY;
+
+
+    return retval;
 }

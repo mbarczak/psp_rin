@@ -350,6 +350,7 @@ int main(int argc, char *argv[])
 
 	gb_init();
 	strcpy(RomPath,setting.lastpath);
+	max_rewind_memory = establish_max_rewind_memory();
 	for(;;){
 		if (!getFilePath(RomPath,EXT_GB|EXT_GZ|EXT_ZIP))
 			continue;
