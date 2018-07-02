@@ -4,12 +4,13 @@ e-mail: efengeler@gmail.com
 */
 
 #include "rewind.h"
-
+#include "tools.h"
 
 
 int num_rwnd_states = 0;
 int rwnd_state_size = 0;
 const int TOTAL_REWIND_MEMORY = 5*1024*1024; //reserves 5 MB for rewind states
+const int SAFE_MEMORY_MARGIN = 1*1024*1024;//left for system to use
 int max_rewind_memory = 0;
 int g_rwnd_period = 0;
 
@@ -28,7 +29,7 @@ void allocate_rewind_states(void){
 	struct rewind_state *created_state, *first_state;
 	int i;
 	rwnd_state_size = gb_save_state(NULL);  //declared in "gbcore/gb.h"
-	num_rwnd_states = (int) ( (float)TOTAL_REWIND_MEMORY / (float) rwnd_state_size );
+	num_rwnd_states = (int) ( (float)max_rewind_memory / (float) rwnd_state_size );
 	
 	//reserves first state
 	created_state =  (struct rewind_state *)malloc( sizeof(struct rewind_state) );
@@ -179,14 +180,6 @@ static long checkAvailableMemoryMixedChunks(){
 	return retval;
 }
 
-static inline long byte2mb(long bytes){
-	return bytes/1024/1024;
-}
-
-static inline long byte2kb(long bytes){
-	return bytes/1024;
-}
-
 void test_available_memory(void){
 	static int testNumber=0;
 #define MSG_LEN 255
@@ -207,8 +200,7 @@ void test_available_memory(void){
 }
 #endif //MAX_MEMORY_ESTIMATION
 int establish_max_rewind_memory(void) {
-    long retval = TOTAL_REWIND_MEMORY;
-
-
+//    long retval = TOTAL_REWIND_MEMORY;
+    long retval = checkAvailableMemoryBiggestSingleChunk() - SAFE_MEMORY_MARGIN;
     return retval;
 }

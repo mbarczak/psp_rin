@@ -1,6 +1,7 @@
 #include "main.h"
 #include "image.h"
 #include "colbl.c"
+#include "tools.h"
 
 SETTING setting, tmpsetting;
 int bTurbo=0, bBitmap;
@@ -1464,16 +1465,17 @@ void rin_menu(void)
 }
 
 extern int num_rwnd_states;
-void showMsgAboutLoadedRom() {
+extern int max_rewind_memory;
+void showMsgAboutLoadedRom() {//TODO: Refactor 3 calls
 #define MAX_LEN 70
-#define MSG "ROM TYPE:%s, REWIND: going back %d steps available."
+#define MSG "ROM TYPE:%s, REWIND: going back %d steps (%ld MB)"
     char tmp[MAX_LEN]={0};
     if(org_gbtype == 1)
-        snprintf(tmp,MAX_LEN,MSG,"GB",num_rwnd_states);
+        snprintf(tmp,MAX_LEN,MSG,"GB",num_rwnd_states,byte2mb(max_rewind_memory));
     else if (org_gbtype == 2)
-        snprintf(tmp,MAX_LEN,MSG,"SGB",num_rwnd_states);
+        snprintf(tmp,MAX_LEN,MSG,"SGB",num_rwnd_states,byte2mb(max_rewind_memory));
     else if (org_gbtype == 3)
-        snprintf(tmp,MAX_LEN,MSG,"GBC",num_rwnd_states);
+        snprintf(tmp,MAX_LEN,MSG,"GBC",num_rwnd_states,byte2mb(max_rewind_memory));
 
     renderer_set_msg(tmp);
 }
