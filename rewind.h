@@ -17,6 +17,6 @@ void allocate_rewind_states(void);
 int read_rewind_state(void);
 void save_rewind_state(void);
 void free_rewind_states(void);
-
+void test_available_memory(void);
 
 #endif

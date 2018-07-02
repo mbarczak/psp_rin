@@ -81,6 +81,5 @@ extern char RinPath[], RomPath[], SavePath[], RomName[], CheatPath[];
 extern int bMenu;
 
 void set_cpu_clock(int n);
-void test_available_memory(void);
 
 #endif

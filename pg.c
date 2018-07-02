@@ -10,6 +10,7 @@
 
 #include "font.c"
 #include "fontNaga10.c"
+#include "rewind.h"
 
 static unsigned int *GEcmd = (unsigned int *)0x441CC000;
 static short *ScreenVertex = (short *)0x441CC100;
