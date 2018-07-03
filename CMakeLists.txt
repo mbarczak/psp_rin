@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
-SET(CMAKE_SYSTEM_NAME Generic)
-SET(CMAKE_SYSTEM_VERSION 1)
-SET(CMAKE_CROSSCOMPILING TRUE)
 project(rin C CXX)
-#include(/usr/local/pspdev/psp/share/cmake/PSP.cmake)
+include(/usr/local/pspdev/psp/share/cmake/PSP.cmake)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -25,10 +22,10 @@ MACRO(HEADER_DIRECTORIES return_list)
 ENDMACRO()
 
 set(return_list ".")
-HEADER_DIRECTORIES(${return_list} ../pspdev/psp/sdk/include)
-include_directories(${return_list} ../pspdev/psp/sdk/include)
+#HEADER_DIRECTORIES(${return_list} ../pspdev/psp/sdk/include)
+#include_directories(${return_list} ../pspdev/psp/sdk/include)
 
 
 
-add_executable(rin ${all_src})
+add_executable(rin ${all_src} tools.c tools.h)
 set_target_properties(rin PROPERTIES LINKER_LANGUAGE CXX)

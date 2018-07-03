@@ -6,7 +6,7 @@ MODE=REL
 TARGET = rin_rm
 OBJS = gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 	gbcore/rom.o gbcore/mbc.o gbcore/apu.o gbcore/cheat.o \
-	main.o pg.o renderer.o rewind.o menu.o filer.o sound.o saveload.o image.o gz.o
+	main.o pg.o renderer.o rewind.o menu.o filer.o sound.o saveload.o image.o gz.o tools.o
 
 INCDIR		=
 
@@ -35,7 +35,7 @@ PSP_EBOOT_TITLE = Rin 1.32 RM v2
 PSPSDK	= $(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak
 
-DST = /home/pxscene/git/psp_rin_release/RIN_1_32_RM/
+DST = /Users/maciek/git/psp_rin_release/RIN_1_32_RM
 SRC = ${TARGET}.prx
 install :
 	rm -f ${DST}/${SRC}
