@@ -11,7 +11,7 @@ int num_rwnd_states = 0;
 int rwnd_state_size = 0;
 const int TOTAL_REWIND_MEMORY = 5*1024*1024; //reserves 5 MB for rewind states
 const int SAFE_MEMORY_MARGIN = 1*1024*1024;//left for system to use
-int max_rewind_memory = 0;
+unsigned max_rewind_memory = 5*1024*1024;
 int g_rwnd_period = 0;
 
 struct rewind_state{
@@ -113,11 +113,11 @@ static int checkIfButtonRepressed(){
 	return retVal;
 }
 
-static long checkAvailableMemoryBiggestSingleChunk(){
+static unsigned checkAvailableMemoryBiggestSingleChunk(){
 	void* mem = NULL;
-	long size = 1024;
-	long incr = 1024;
-	while(mem = malloc(size)){
+    unsigned size = 1024;
+    unsigned incr = 1024;
+	while((mem = malloc(size))){
 		free(mem);
 		size += incr;
 	}
@@ -159,14 +159,14 @@ list* list_add(list** head, void* mem){
 	return NULL;
 }
 
-static long checkAvailableMemoryMixedChunks(){
-	long retval = 0L;
+static unsigned checkAvailableMemoryMixedChunks(){
+	unsigned retval = 0;
 	void* mem = NULL;
 	list* head = list_alloc();
-	long size = 1024*512;
+	size_t size = 1024*512;
 	int len = 0;
 
-	while(mem = malloc(size)){
+	while((mem = malloc(size))){
 		if(!list_add(&head,mem)){
 			free(mem);
 			break;
@@ -187,9 +187,9 @@ void test_available_memory(void){
 	ctrl_data_t paddata;
 	sceCtrlPeekBufferPositive(&paddata, 1);
 	if(checkIfButtonRepressed()){
-		long availBiggest = checkAvailableMemoryBiggestSingleChunk();
-		long availMixed = checkAvailableMemoryMixedChunks();
-		snprintf(tmp,MSG_LEN,"Mem:%d,big chunk: %ld mb (%ld kb);small:%ld mb (%ld kb)\n",
+		unsigned availBiggest = checkAvailableMemoryBiggestSingleChunk();
+        unsigned availMixed = checkAvailableMemoryMixedChunks();
+		snprintf(tmp,MSG_LEN,"Mem:%d,big chunk: %d mb (%d kb);small:%d mb (%d kb)\n",
 				 testNumber,byte2mb(availBiggest),byte2kb(availBiggest),byte2mb(availMixed),byte2kb(availMixed));
 		printf(tmp);
 		testNumber++;
@@ -199,8 +199,7 @@ void test_available_memory(void){
 	pgPrintf(0,1,RGB(255,0,0),tmp);
 }
 #endif //MAX_MEMORY_ESTIMATION
-int establish_max_rewind_memory(void) {
-//    long retval = TOTAL_REWIND_MEMORY;
-    long retval = checkAvailableMemoryBiggestSingleChunk() - SAFE_MEMORY_MARGIN;
+unsigned establish_max_rewind_memory(void) {
+    unsigned retval = checkAvailableMemoryBiggestSingleChunk() - SAFE_MEMORY_MARGIN;
     return retval;
 }

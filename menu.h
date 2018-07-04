@@ -17,8 +17,8 @@ typedef struct
 	int n;
 } S_BUTTON;
 
-#define VERRIN "1.32"
-#define VERCNF "RINv1.31"
+#define VERRIN "1.32 RM mod v2"
+#define VERCNF "RINv1.31_rmv1"
 
 typedef struct
 {
@@ -41,6 +41,7 @@ typedef struct
 	unsigned long color[4];
 	u8 bgbright;
 	char lastpath[256];
+	u32 user_max_rewind_memory;
 } SETTING;
 
 extern SETTING setting, tmpsetting;

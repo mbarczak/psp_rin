@@ -22,7 +22,7 @@ void free_rewind_states(void);
 #ifdef MAX_MEMORY_ESTIMATION
 void test_available_memory(void);
 #endif
-int establish_max_rewind_memory(void);
-extern int max_rewind_memory;
+unsigned establish_max_rewind_memory(void);
+extern unsigned int max_rewind_memory;
 
 #endif

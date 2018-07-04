@@ -2,6 +2,8 @@
 #include "image.h"
 #include "colbl.c"
 #include "tools.h"
+#include "menu.h"
+#include "rewind.h"
 
 SETTING setting, tmpsetting;
 int bTurbo=0, bBitmap;
@@ -65,6 +67,7 @@ void init_config()
 		setting.bGB_Pals[i] = 1;
 	setting.compress = 1;
 	setting.quickslot = 0;
+	setting.user_max_rewind_memory = max_rewind_memory;
 }
 
 void check_config()
@@ -220,7 +223,7 @@ void rin_frame(const char *msg0, const char *msg1)
 		pgFillvram(setting.color[0]);
 
 	// バージョンナンバー
-	sprintf(tmp, "■ ＲＩＮ Ver%s RM mod v2 ■", VERRIN);
+	sprintf(tmp, "■ ＲＩＮ Ver%s ■", VERRIN);
 	mh_print(465-strlen(tmp)*5, 0, tmp, setting.color[1]);
 
 	// メッセージなど
@@ -1465,10 +1468,10 @@ void rin_menu(void)
 }
 
 extern int num_rwnd_states;
-extern int max_rewind_memory;
+extern unsigned max_rewind_memory;
 void showMsgAboutLoadedRom() {//TODO: Refactor 3 calls
 #define MAX_LEN 70
-#define MSG "ROM TYPE:%s, REWIND: going back %d steps (%ld MB)"
+#define MSG "ROM TYPE:%s, REWIND: going back %d steps (%d MB)"
     char tmp[MAX_LEN]={0};
     if(org_gbtype == 1)
         snprintf(tmp,MAX_LEN,MSG,"GB",num_rwnd_states,byte2mb(max_rewind_memory));

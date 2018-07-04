@@ -4,11 +4,11 @@
 
 #ifndef RIN_TOOLS_H
 #define RIN_TOOLS_H
-static inline long byte2mb(long bytes){
+static inline unsigned byte2mb(unsigned bytes){
 	return bytes/1024/1024;
 }
 
-static inline long byte2kb(long bytes){
+static inline unsigned byte2kb(unsigned bytes){
 	return bytes/1024;
 }
 

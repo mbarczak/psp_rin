@@ -335,7 +335,8 @@ int main(int argc, char *argv[])
 	SetupCallbacks();
 	pgScreenFrame(2,0);
 	wavoutInit();
-	
+    max_rewind_memory = establish_max_rewind_memory();
+
 	load_config();
 	bBitmap = load_menu_bg();
 	if(bBitmap) bgbright_change();
@@ -350,7 +351,6 @@ int main(int argc, char *argv[])
 
 	gb_init();
 	strcpy(RomPath,setting.lastpath);
-	max_rewind_memory = establish_max_rewind_memory();
 	for(;;){
 		if (!getFilePath(RomPath,EXT_GB|EXT_GZ|EXT_ZIP))
 			continue;
