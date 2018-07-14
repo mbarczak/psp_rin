@@ -11,7 +11,7 @@ OBJS = gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 INCDIR		=
 
 ARCHFLAGS =-mgp32 -mlong32 -msingle-float -mabi=eabi
-CFLAGS = -Wall -fomit-frame-pointer $(ARCHFLAGS) -G3
+CFLAGS = -Wall -fomit-frame-pointer $(ARCHFLAGS) -G3 -Wdouble-promotion
 
 ifeq ($(MODE),REL)
 CFLAGS += -O3

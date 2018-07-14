@@ -19,7 +19,7 @@ void init_config()
 	int i;
 
 	strcpy(setting.vercnf, VERCNF);
-	
+
 	setting.screensize = SCR_X2_FIT;
 	setting.gb_type = 0;
 	setting.gb_palette = PAL_DARK_GREEN;
@@ -27,13 +27,13 @@ void init_config()
 	setting.vsync = 1;
 	setting.sound = 1;
 	setting.sound_buffer = 0;
-	
+
 	setting.color[0] = DEF_COLOR0;
 	setting.color[1] = DEF_COLOR1;
 	setting.color[2] = DEF_COLOR2;
 	setting.color[3] = DEF_COLOR3;
 	setting.bgbright=100;
-	
+
 	for(i=0; i<32; i++){
 		setting.skeys[i].buttons = 0;
 		setting.skeys[i].n = -1;
@@ -51,12 +51,12 @@ void init_config()
 	setting.skeys[7].n = 11;
 	setting.skeys[8].buttons = CTRL_RTRIGGER|CTRL_START;
 	setting.skeys[8].n = 12;
-	
+
 	//davex: default key for rewinding
 	setting.skeys[9].buttons = CTRL_RTRIGGER;
 	setting.skeys[9].n = 8;
-	
-	
+
+
 	setting.analog2dpad=1;
 	setting.thumb = 1;
 	setting.cpu_clock = 0;
@@ -67,7 +67,11 @@ void init_config()
 		setting.bGB_Pals[i] = 1;
 	setting.compress = 1;
 	setting.quickslot = 0;
-	setting.user_max_rewind_memory = max_rewind_memory;
+	setting.rewind_user_max_memory_ammount = max_rewind_memory;
+	setting.rewind_user_max_states_ammount = 100;
+	setting.rewind_always_use_max_memory = 1;
+	setting.rewind_always_use_max_states = 1;
+	setting.rewind_limit_mode = REWIND_MODE_LIMIT_MEMORY_AMOUNT;
 }
 
 void check_config()
@@ -141,7 +145,7 @@ void set_gb_type()
 			lcd_set_mpal(setting.gb_palette);
 			break;
 		}
-		
+
 		if(rom_get_info()->gb_type>=3 && org_gbtype==3)
 			now_gb_mode = 3;
 		else if(rom_get_info()->gb_type==2 && sgb_mode)
@@ -181,25 +185,25 @@ int load_menu_bg()
 
 // 半透明処理
 unsigned short rgbTransp(unsigned short fgRGB, unsigned short bgRGB, int alpha) {
-    unsigned short fgR, fgG, fgB;
-    unsigned short bgR, bgG, bgB;
+	unsigned short fgR, fgG, fgB;
+	unsigned short bgR, bgG, bgB;
 	unsigned short R, G, B;
- 	unsigned short rgb;
+	unsigned short rgb;
 
-    fgB = (fgRGB >> 10) & 0x1F;
-    fgG = (fgRGB >> 5) & 0x1F;
-    fgR = fgRGB & 0x1F;
+	fgB = (fgRGB >> 10) & 0x1F;
+	fgG = (fgRGB >> 5) & 0x1F;
+	fgR = fgRGB & 0x1F;
 
-    bgB = (bgRGB >> 10) & 0x1F;
-    bgG = (bgRGB >> 5) & 0x1F;
-    bgR = bgRGB & 0x1F;
+	bgB = (bgRGB >> 10) & 0x1F;
+	bgG = (bgRGB >> 5) & 0x1F;
+	bgR = bgRGB & 0x1F;
 
 	R = coltbl[fgR][bgR][alpha/10];
 	G = coltbl[fgG][bgG][alpha/10];
 	B = coltbl[fgB][bgB][alpha/10];
 
 	rgb = (((B & 0x1F)<<10)+((G & 0x1F)<<5)+((R & 0x1F)<<0)+0x8000);
-    return rgb;
+	return rgb;
 }
 
 void bgbright_change()
@@ -254,7 +258,7 @@ int rin_MessageBox(const char *msg, int type){
 		}else if(new_pad & CTRL_CROSS && type){
 			return 0;
 		}
-		
+
 		if(type)
 			rin_frame(0,"○：OK  ×：Cancel");
 		else
@@ -374,15 +378,15 @@ void rin_colorconfig(void)
 			else					sel=COLOR0_R;
 		}
 		if(!bLoop) break;
-		
+
 		for(i=0; i<4; i++)
 			setting.color[i]=color[i][2]<<10|color[i][1]<<5|color[i][0]|0x8000;
-		
+
 		if (crs_count++>=30) crs_count=0;
-		
+
 		x = 2;
 		y = 5;
-		
+
 		if(sel>=COLOR0_R && sel<=BG_BRIGHT)
 			strcpy(msg, "○：Add　□：Sub ×：Return");
 		else
@@ -422,7 +426,7 @@ void rin_colorconfig(void)
 			sprintf(tmp, "%d", color[i/3][i%3]);
 			pgPrint(x,y++,setting.color[3],tmp);
 		}
-		
+
 		if (crs_count < 15){
 			x = 2;
 			y = sel + 5;
@@ -433,7 +437,7 @@ void rin_colorconfig(void)
 			if(sel>=EXIT) y++;
 			pgPutChar((x+1)*8,y*8,setting.color[3],0,127,1,0,1);
 		}
-		
+
 		pgScreenFlipV();
 	}
 }
@@ -441,18 +445,18 @@ void rin_colorconfig(void)
 int cmp_skey(S_BUTTON *a, S_BUTTON *b)
 {
 	int i, na=0, nb=0;
-	
+
 	for(i=0; i<32; i++){
 		if ((a->buttons >> i) & 1) na++;
 		if ((b->buttons >> i) & 1) nb++;
 	}
-    return nb-na;
+	return nb-na;
 }
 
 void sort_skeys(S_BUTTON *a, int left, int right) {
 	S_BUTTON tmp, pivot;
 	int i, p;
-	
+
 	if (left < right) {
 		pivot = a[left];
 		p = left;
@@ -498,14 +502,14 @@ void rin_keyconfig(void)
 	char msg[256];
 	int key_config[32];
 	int sel=0, x, y, i, bPad=0, crs_count=0;
-	
+
 	for(i=0; i<32; i++)
 		key_config[i] = 0;
 	for(i=0; i<32; i++){
 		if(setting.skeys[i].n >= 0)
 			key_config[setting.skeys[i].n] = setting.skeys[i].buttons;
 	}
-	
+
 	for(;;){
 		readpad();
 		if(now_pad & (CTRL_UP|CTRL_DOWN|CTRL_LEFT|CTRL_RIGHT))
@@ -545,16 +549,16 @@ void rin_keyconfig(void)
 		}else{
 			bPad=0;
 		}
-		
+
 		if (crs_count++>=30) crs_count=0;
-		
+
 		if(sel>=CONFIG_ANALOG2DPAD)
 			strcpy(msg,"○：OK");
 		else
 			strcpy(msg,"←→：Clear");
-		
+
 		rin_frame(0, msg);
-		
+
 		x=2; y=5;
 		pgPrint(x,y++,setting.color[3],"  A BUTTON       :");
 		pgPrint(x,y++,setting.color[3],"  B BUTTON       :");
@@ -580,7 +584,7 @@ void rin_keyconfig(void)
 			pgPrint(x,y++,setting.color[3],"  AnalogPad to D-Pad: OFF");
 		y++;
 		pgPrint(x,y++,setting.color[3],"  Return to Main Menu");
-		
+
 		for (i=0; i<CONFIG_ANALOG2DPAD; i++){
 			y = i + 5;
 			int j = 0;
@@ -628,8 +632,8 @@ void rin_keyconfig(void)
 			}
 			pgPrint(21,y,setting.color[3],msg);
 		}
-		
-		
+
+
 		if (crs_count < 15){
 			x = 2;
 			y = sel + 5;
@@ -637,10 +641,10 @@ void rin_keyconfig(void)
 			if(sel >= CONFIG_EXIT)        y++;
 			pgPutChar((x+1)*8,y*8,setting.color[3],0,127,1,0,1);
 		}
-		
+
 		pgScreenFlipV();
 	}
-	
+
 	for(i=0; i<32; i++){
 		if (i!=6 && key_config[i] == key_config[6])
 			key_config[i] = 0;
@@ -665,7 +669,7 @@ const char *gbtype_names[] = {
 int rin_gbtype(int n)
 {
 	int x,y,i,sel=n;
-	
+
 	for(;;){
 		readpad();
 		if(new_pad & CTRL_CIRCLE)
@@ -685,14 +689,14 @@ int rin_gbtype(int n)
 			sel-=2;
 			if(sel<0) sel=0;
 		}
-		
+
 		rin_frame("Select GB Type", "○：OK  ×：Cancel");
-		
+
 		x=4, y=5;
 		pgPrint(x++,y++,setting.color[3],"GB TYPE:");
 		for(i=0; i<=4; i++)
 			pgPrint(x,y++,setting.color[i==sel?2:3],gbtype_names[i]);
-		
+
 		pgScreenFlipV();
 	}
 }
@@ -700,7 +704,7 @@ int rin_gbtype(int n)
 int rin_screensize(int n)
 {
 	int x,y,i,sel=n;
-	
+
 	for(;;){
 		readpad();
 		if(new_pad & CTRL_CIRCLE)
@@ -726,12 +730,12 @@ int rin_screensize(int n)
 			sel-=SCR_END/2;
 			if(sel<0) sel=0;
 		}
-		
+
 		if(setting.bScreenSizes[sel])
 			rin_frame("Select Screen Size", "○：OK  ×：Cancel   SELECT：Disable");
 		else
 			rin_frame("Select Screen Size", "○：OK  ×：Cancel   SELECT：Enable");
-		
+
 		x=4, y=5;
 		pgPrint(x++,y++,setting.color[3],"SCREEN SIZE:");
 		for(i=0; i<SCR_END; i++){
@@ -739,7 +743,7 @@ int rin_screensize(int n)
 				pgPrint(x-2,y,setting.color[1],"+");
 			pgPrint(x,y++,setting.color[i==sel?2:3],scr_names[i]);
 		}
-		
+
 		pgScreenFlipV();
 	}
 }
@@ -747,7 +751,7 @@ int rin_screensize(int n)
 int rin_gbcolor(int n)
 {
 	int x,y,i,sel=n;
-	
+
 	for(;;){
 		readpad();
 		if(new_pad & CTRL_CIRCLE)
@@ -773,12 +777,12 @@ int rin_gbcolor(int n)
 			sel-=(PAL_SGB-1)/2;
 			if(sel<1) sel=1;
 		}
-		
+
 		if(setting.bGB_Pals[sel])
 			rin_frame("Select GB Palette", "○：OK  ×：Cancel   SELECT:Disable");
 		else
 			rin_frame("Select GB Palette", "○：OK  ×：Cancel   SELECT:Enable");
-		
+
 		x=4, y=5;
 		pgPrint(x++,y++,setting.color[3],"GB PALETTE:");
 		for(i=1; i<PAL_SGB; i++){
@@ -786,7 +790,7 @@ int rin_gbcolor(int n)
 				pgPrint(x-2,y,setting.color[1],"+");
 			pgPrint(x,y++,setting.color[i==sel?2:3],pal_names[i]);
 		}
-		
+
 		pgScreenFlipV();
 	}
 }
@@ -795,9 +799,9 @@ int rin_frameskip(int sel)
 {
 	char tmp[8];
 	int x,y,i;
-	
+
 	strcpy(tmp,"0");
-	
+
 	for(;;){
 		readpad();
 		if(new_pad & CTRL_CIRCLE)
@@ -817,16 +821,16 @@ int rin_frameskip(int sel)
 			sel-=5;
 			if(sel<0) sel=0;
 		}
-		
+
 		rin_frame("Select Max Frame Skip", "○：OK  ×：Cancel");
-		
+
 		x=4, y=5;
 		pgPrint(x++,y++,setting.color[3],"MAX FRAME SKIP:");
 		for(i=0; i<=9; i++){
 			tmp[0] = i + '0';
 			pgPrint(x,y++,setting.color[i==sel?2:3],tmp);
 		}
-		
+
 		pgScreenFlipV();
 	}
 }
@@ -839,7 +843,7 @@ const char *cpu_clocks[] = {
 int rin_cpuclock(int sel)
 {
 	int x,y,i;
-	
+
 	for(;;){
 		readpad();
 		if(new_pad & CTRL_CIRCLE)
@@ -853,14 +857,14 @@ int rin_cpuclock(int sel)
 			sel--;
 			if(sel<0) sel=2;
 		}
-		
+
 		rin_frame("Select CPU Clock (DANGER! DANGER! DANGER! DANGER! DANGER!)", "○：OK  ×：Cancel");
-		
+
 		x=4, y=5;
 		pgPrint(x++,y++,setting.color[3],"CPU CLOCK:");
 		for(i=0; i<3; i++)
 			pgPrint(x,y++,setting.color[i==sel?2:3],cpu_clocks[i]);
-		
+
 		pgScreenFlipV();
 	}
 }
@@ -873,7 +877,7 @@ const char *sound_buffers[] = {
 int rin_sound_buffers(int sel)
 {
 	int x,y,i;
-	
+
 	for(;;){
 		readpad();
 		if(new_pad & CTRL_CIRCLE)
@@ -887,14 +891,14 @@ int rin_sound_buffers(int sel)
 			sel--;
 			if(sel<0) sel=2;
 		}
-		
+
 		rin_frame("Select Sound Buffer", "○：OK  ×：Cancel");
-		
+
 		x=4, y=5;
 		pgPrint(x++,y++,setting.color[3],"SOUND BUFFER:");
 		for(i=0; i<3; i++)
 			pgPrint(x,y++,setting.color[i==sel?2:3],sound_buffers[i]);
-		
+
 		pgScreenFlipV();
 	}
 }
@@ -903,11 +907,11 @@ void rin_findState(int nState[], int nThumb[])
 {
 	char tmp[MAX_PATH], *p;
 	int i, j;
-	
+
 	strcpy(tmp,SavePath);
 	p = strrchr(tmp,'/') + 1;
 	*p = 0;
-	
+
 	nfiles = 0;
 	strcpy(path_files, tmp);
 	int fd = sceIoDopen(tmp);
@@ -917,7 +921,7 @@ void rin_findState(int nState[], int nThumb[])
 		nfiles++;
 	}
 	sceIoDclose(fd);
-	
+
 	for(i=0; i<=STATE_SLOT_MAX; i++){
 		get_state_path(i,tmp);
 		nState[i]=-1;
@@ -937,7 +941,7 @@ void rin_findState(int nState[], int nThumb[])
 				}
 			}
 		}
-		
+
 		get_thumb_path(i,tmp);
 		nThumb[i]=-1;
 		for(j=0; j<nfiles; j++){
@@ -1011,7 +1015,7 @@ int rin_stateslot(int type)
 			sel-=(MAX_ITEM+1)/2;
 			if(sel<0) sel=0;
 		}
-		
+
 		if (sel!=sel_bak){
 			sel_bak = sel;
 			if (sel > STATE_SLOT_MAX){
@@ -1028,7 +1032,7 @@ int rin_stateslot(int type)
 					nThumb[sel] = -1;
 			}
 		}
-		
+
 		switch(type)
 		{
 		case RIN_STATE_LOAD:
@@ -1044,14 +1048,14 @@ int rin_stateslot(int type)
 			p = NULL;
 		}
 		rin_frame(p,"○：OK  ×：Cancel   SELECT：Remove");
-		
+
 		if ((sel>STATE_SLOT_MAX && state_tmp) ||
 			(sel<=STATE_SLOT_MAX && nState[sel]>=0 && nThumb[sel]>=0)){
 			pgBitBlt(272,50,160,144,1,thumb_w);
 			pgDrawFrame(270,48,433,195,setting.color[1]);
 			pgDrawFrame(271,49,432,194,setting.color[1]);
 		}
-		
+
 		switch(type)
 		{
 		case RIN_STATE_LOAD:
@@ -1093,7 +1097,7 @@ int rin_stateslot(int type)
 		}else
 			strcpy(msg,"TMP:None");
 		pgPrint(x,y++,setting.color[i==sel?2:3],msg);
-		
+
 		pgScreenFlipV();
 	}
 
@@ -1105,7 +1109,7 @@ void select_cheat(void)
 {
 	static int sel=0;
 	int top=0, rows=21, x, y, h, i;
-	
+
 	cheat_decreate_cheat_map();
 
 	for(;;){
@@ -1127,16 +1131,16 @@ void select_cheat(void)
 		}else if(new_pad & CTRL_RIGHT){
 			sel+=rows/2;
 		}
-		
+
 		if(top > nCheats-rows)	top=nCheats-rows;
 		if(top < 0)				top=0;
 		if(sel >= nCheats)		sel=nCheats-1;
 		if(sel < 0)				sel=0;
 		if(sel >= top+rows)		top=sel-rows+1;
 		if(sel < top)			top=sel;
-		
+
 		rin_frame("","○：OK  ×：Return  □：All");
-		
+
 		// スクロールバー
 		if(nCheats > rows){
 			h = 219;
@@ -1144,7 +1148,7 @@ void select_cheat(void)
 			pgFillBox(448, h*top/nCheats + 27,
 				460, h*(top+rows)/nCheats + 27,setting.color[1]);
 		}
-		
+
 		x=30; y=32;
 		for (i=0; i<rows; i++){
 			if (top+i >= nCheats) break;
@@ -1153,12 +1157,226 @@ void select_cheat(void)
 				mh_print(x-6, y, "*", setting.color[3]);
 			y+=10;
 		}
-		
+
 		pgScreenFlipV();
 	}
 
 	cheat_create_cheat_map();
 	return;
+}
+#define MAX_MENU_ENTRY_LENGTH 200
+
+static char* rin_menu_rewind_get_main_menu_string(){
+	static char buf[MAX_MENU_ENTRY_LENGTH] = {0};
+	if(setting.rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT) {
+		if(setting.rewind_always_use_max_memory){
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%uMB(no limit)",byte2mb(max_rewind_memory));
+		} else{
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%uMB(user limit)",byte2mb(setting.rewind_user_max_memory_ammount));
+		}
+	}else{
+		if(setting.rewind_always_use_max_states){
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%u states(no limit)",setting.rewind_user_max_states_ammount);
+		}else{
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%u states(user limit)",num_rwnd_states);
+		}
+	}
+	return buf;
+}
+
+
+static int rin_menu_rewind_get_config_decrease_row(const int MAX_ROW, int sel);
+static int rin_menu_rewind_get_config_increase_row(const int MAX_ROW, int sel);
+static void rin_menu_rewind_get_config_save_value(SETTING* localSettings);
+static void rin_menu_rewind_get_config_increase_value(SETTING* local);
+static void rin_menu_rewind_get_config_decrease_value(SETTING* local);
+static void rin_menu_rewind_get_config_show_current(long sel,SETTING* local);
+static void rin_menu_rewind_get_config_toogle_max(SETTING *local);
+static void change_value(u32 * baseValue,int lowerBound,int upperBound,int step,int direction);
+static void rin_frame_rewind_use_max();
+static void rin_frame_rewind_no_max();
+static void change_selected_value(SETTING *local, int direction);
+static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
+static void print_rewind_states_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
+
+void rin_frame_rewind(SETTING *local);
+/*
+ *
+ * 0 : Limit mode : memory amount
+ * 1 : Prefered memory amount designed for rewind purposes (current max: 23mb): 9mb | Always use MAX
+ *    rin_frame("□：Don't Use max ×：Cancel ○：Save ");
+ *    rin_frame("□：Use max <-：Sub ->：Add　×：Cancel ○：Save ");
+ *
+ * 0 : Limit mode : number of states
+ * 1 : Prefered number of rewind states : 10 states | Always use MAX
+ *    rin_frame("□：Don't Use max ×：Cancel ○：Save ");
+ *    rin_frame("□：Use max <-：Sub ->：Add　×：Cancel ○：Save ");
+ */
+
+void rin_menu_rewind_get_config(void)
+{
+	const int MAX_ROW = 1;
+	SETTING localSettings;
+	memcpy(&localSettings,&setting, sizeof(SETTING));
+	long sel=0;
+	for(;;){
+		readpad();
+		if(new_pad & CTRL_CIRCLE){
+			rin_menu_rewind_get_config_save_value(&localSettings);
+			break;
+		}else if(new_pad & CTRL_CROSS){
+			break;
+		}else if(new_pad & CTRL_SQUARE){
+			rin_menu_rewind_get_config_toogle_max(&localSettings);
+		}else if(new_pad & CTRL_DOWN){
+			sel = rin_menu_rewind_get_config_decrease_row(MAX_ROW, sel);
+		}else if(new_pad & CTRL_UP){
+			sel = rin_menu_rewind_get_config_increase_row(MAX_ROW, sel);
+		}else if(new_pad & CTRL_RIGHT){
+			if(sel == 0){
+				localSettings.rewind_limit_mode = (u8)!localSettings.rewind_limit_mode;
+			}else if (sel == 1){
+				rin_menu_rewind_get_config_increase_value(&localSettings);
+			}
+		}else if(new_pad & CTRL_LEFT){
+			if(sel == 0){
+				localSettings.rewind_limit_mode = (u8
+						)!localSettings.rewind_limit_mode;
+			}else if (sel == 1){
+				rin_menu_rewind_get_config_decrease_value(&localSettings);
+			}
+		}
+		rin_menu_rewind_get_config_show_current(sel,&localSettings);
+	}
+}
+static void rin_menu_rewind_get_config_toogle_max(SETTING *local) {
+	if(local->rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT){
+		local->rewind_always_use_max_memory = (u8)!local->rewind_always_use_max_memory;
+	}else{
+		local->rewind_always_use_max_states = (u8)!local->rewind_always_use_max_states;
+	}
+}
+
+#define REWIND_MEMORY_STEP ((int)(0.5 * 1024 *1024))
+#define REWIND_STATES_STEP 10
+
+static void rin_menu_rewind_get_config_decrease_value(SETTING* local) {
+	change_selected_value(local, -1);
+}
+static void rin_menu_rewind_get_config_increase_value(SETTING* local) {
+	change_selected_value(local, 1);
+}
+
+static void change_selected_value(SETTING *local, int direction) {
+	if(local->rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT){
+		if(!local->rewind_always_use_max_memory){
+			change_value(&local->rewind_user_max_memory_ammount,REWIND_MIN_USER_MEMORY,
+						 REWIND_MAX_USER_MEMORY,REWIND_MEMORY_STEP,direction);
+		}
+	}else{
+		if(!local->rewind_always_use_max_states){
+			change_value(&local->rewind_user_max_states_ammount,REWIND_MIN_USER_STATES,
+						REWIND_MAX_USER_STATES,REWIND_STATES_STEP,direction);
+		}
+	}
+}
+
+static void change_value(u32* baseValue,int lowerBound,int upperBound,int step,int direction){
+	(*baseValue) += (REWIND_MEMORY_STEP*direction);
+	if((*baseValue) > REWIND_MAX_USER_MEMORY){
+		(*baseValue) = REWIND_MIN_USER_MEMORY;
+	} else if((*baseValue) < REWIND_MIN_USER_MEMORY){
+		(*baseValue) = REWIND_MAX_USER_MEMORY;
+	}
+}
+
+static void rin_menu_rewind_get_config_save_value(SETTING* localSettings) {
+	memcpy(&setting,&localSettings, sizeof(SETTING));
+}
+
+static int rin_menu_rewind_get_config_increase_row(const int MAX_ROW, int sel) {
+	sel--;
+	if(sel<0) sel=MAX_ROW;
+	return sel;
+}
+
+static int rin_menu_rewind_get_config_decrease_row(const int MAX_ROW, int sel) {
+	sel++;
+	if(sel>MAX_ROW) sel=0;
+	return sel;
+}
+
+static unsigned long rewind_get_text_color(const long sel,const int element) {
+	return setting.color[sel==element?2:3];
+}
+
+void rin_menu_rewind_get_config_show_current(long sel,SETTING* local) {
+
+	unsigned long x=4,y=5;
+	rin_frame_rewind(local);
+	pgPrintf(x,y++,rewind_get_text_color(sel,0),"Limit mode : %s",
+	         local->rewind_limit_mode==REWIND_MODE_LIMIT_MEMORY_AMOUNT?"memory amount":"number of states");
+	if(local->rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT){
+		print_rewind_memory_limit_line(&x, &y, local, sel);
+	}else{
+		print_rewind_states_limit_line(&x, &y, local, sel);
+	}
+	pgScreenFlipV();
+}
+void rin_frame_rewind(SETTING *local) {
+	if(local->rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT){
+		if(local->rewind_always_use_max_memory){
+			rin_frame_rewind_use_max();
+		}else{
+			rin_frame_rewind_no_max();
+		}
+	}else{
+		if(local->rewind_always_use_max_states){
+			rin_frame_rewind_use_max();
+		}else{
+			rin_frame_rewind_no_max();
+		}
+	}
+}
+
+static void print_rewind_states_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel) {
+	char tmpString[MAX_MENU_ENTRY_LENGTH] = {0};
+	if(local->rewind_always_use_max_states){
+			snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"Always use MAX");
+		}else{
+			snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"%d states",local->rewind_user_max_states_ammount);
+		}
+	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
+		         "Prefered number of rewind states : %s",tmpString);
+}
+
+static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel) {
+	char tmpString[MAX_MENU_ENTRY_LENGTH] = {0};
+	char maxStr[MAX_MENU_ENTRY_LENGTH] = {0};
+
+	if(local->rewind_always_use_max_memory){
+		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"Always use MAX");
+	}else{
+		float num = byte2mb_asFloat(local->rewind_user_max_memory_ammount);
+		ftoa(num,tmpString,1);
+		strcat(tmpString,"mb");
+	}
+	ftoa(byte2mb_asFloat(max_rewind_memory),maxStr,1);
+
+	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
+		         "Prefered memory amount designed for rewind purposes (current max:%smb): %s",maxStr,tmpString);
+}
+
+static char* rin_frame_get_title(){
+	return "Tweak Rewind Settings";
+}
+
+static void rin_frame_rewind_use_max() {
+	rin_frame(rin_frame_get_title(),"□：Don't Use max ×：Cancel ○：Save ");
+}
+
+static void rin_frame_rewind_no_max(){
+	rin_frame(rin_frame_get_title(),"□：Use max <-：Sub ->：Add　×：Cancel ○：Save ");
 }
 
 void rin_menu(void)
@@ -1174,6 +1392,7 @@ void rin_menu(void)
 		GB_TYPE,
 		GB_PALETTE,
 		TURBO,
+		REWIND,
 		VSYNC,
 		SOUND,
 		SOUND_BUFFER,
@@ -1191,11 +1410,11 @@ void rin_menu(void)
 	static int sel=0;
 	int x, y, ret, crs_count=0, bLoop=1;
 	int romsize, ramsize;
-	
+
 	old_pad = 0;
 	readpad();
 	old_pad = paddata.buttons;
-	
+
 	for(;;){
 		readpad();
 		if(now_pad & (CTRL_UP|CTRL_DOWN|CTRL_LEFT|CTRL_RIGHT))
@@ -1261,6 +1480,11 @@ void rin_menu(void)
 			case TURBO:
 				bTurbo = !bTurbo;
 				break;
+			case REWIND:
+//				rin_gbtype(1);
+				rin_menu_rewind_get_config();
+				crs_count=0;
+				break;
 			case SOUND:
 				setting.sound = !setting.sound;
 				break;
@@ -1303,7 +1527,7 @@ void rin_menu(void)
 				rin_keyconfig();
 				crs_count=0;
 				break;
-			case LOAD_CHEAT: 
+			case LOAD_CHEAT:
 				if(getFilePath(CheatPath,EXT_TCH)){
 					strcpy(msg, "Cheat Load Failed");
 					FILE *fp = fopen(CheatPath,"r");
@@ -1335,7 +1559,7 @@ void rin_menu(void)
 
 					bTurbo = 0;
 					bLoop = 0;
-					
+
 					if (rom_get_loaded() && rom_has_battery())
 						save_sram(get_sram(), rom_get_info()->ram_size);
 
@@ -1404,15 +1628,15 @@ void rin_menu(void)
 			bLoop = 0;
 			break;
 		}
-		
+
 		if(!bLoop) break;
 		if (crs_count++>=30) crs_count=0;
-		
+
 		rin_frame(msg, "○：OK  ×：Continue  MenuBTN：Continue");
-		
+
 		x = 4;
 		y = 5;
-		
+
 		pgPrintf(x,y++,setting.color[3],"STATE SAVE");
 		pgPrintf(x,y++,setting.color[3],"STATE LOAD");
 		if (setting.quickslot > STATE_SLOT_MAX)
@@ -1426,6 +1650,7 @@ void rin_menu(void)
 		pgPrintf(x,y++,setting.color[3],"GB TYPE       : %s",gbtype_names[setting.gb_type]);
 		pgPrintf(x,y++,setting.color[3],"GB PALETTE    : %s",pal_names[setting.gb_palette]);
 		pgPrintf(x,y++,setting.color[3],"TURBO         : %s",bTurbo?"ON":"OFF");
+		pgPrintf(x,y++,setting.color[3],"REWIND        : %s",rin_menu_rewind_get_main_menu_string());
 		pgPrintf(x,y++,setting.color[3],"VSYNC         : %s",setting.vsync?"ON":"OFF");
 		pgPrintf(x,y++,setting.color[3],"SOUND         : %s",setting.sound?"ON":"OFF");
 		pgPrintf(x,y++,setting.color[3],"SOUND BUFFER  : %s",sound_buffers[setting.sound_buffer]);
@@ -1440,7 +1665,7 @@ void rin_menu(void)
 		pgPrintf(x,y++,setting.color[3],"Back to ROM list");
 		pgPrintf(x,y++,setting.color[3],"Reset");
 		pgPrintf(x,y++,setting.color[3],"Continue");
-		
+
 		if(crs_count < 15){
 			y = sel + 5;
 			if(sel >= SCREEN_SIZE)	y++;
@@ -1449,10 +1674,10 @@ void rin_menu(void)
 			tmp[0]=127; tmp[1]=0;
 			pgPrintf(x-1,y,setting.color[3],tmp);
 		}
-		
+
 		pgScreenFlipV();
 	}
-	
+
 	pgFillvram(0);
 	pgScreenFlipV();
 	pgFillvram(0);
@@ -1461,7 +1686,7 @@ void rin_menu(void)
 	pgWaitVn(10);
 	memset(&paddata, 0x00, sizeof(paddata));
 	wavoutClear();
-	
+
 	if(render_msg_mode!=6)
 		render_msg_mode = 0;
 	border_uploaded = 2;
@@ -1472,13 +1697,13 @@ extern unsigned max_rewind_memory;
 void showMsgAboutLoadedRom() {//TODO: Refactor 3 calls
 #define MAX_LEN 70
 #define MSG "ROM TYPE:%s, REWIND: going back %d steps (%d MB)"
-    char tmp[MAX_LEN]={0};
-    if(org_gbtype == 1)
-        snprintf(tmp,MAX_LEN,MSG,"GB",num_rwnd_states,byte2mb(max_rewind_memory));
-    else if (org_gbtype == 2)
-        snprintf(tmp,MAX_LEN,MSG,"SGB",num_rwnd_states,byte2mb(max_rewind_memory));
-    else if (org_gbtype == 3)
-        snprintf(tmp,MAX_LEN,MSG,"GBC",num_rwnd_states,byte2mb(max_rewind_memory));
+	char tmp[MAX_LEN]={0};
+	if(org_gbtype == 1)
+		snprintf(tmp,MAX_LEN,MSG,"GB",num_rwnd_states,byte2mb(max_rewind_memory));
+	else if (org_gbtype == 2)
+		snprintf(tmp,MAX_LEN,MSG,"SGB",num_rwnd_states,byte2mb(max_rewind_memory));
+	else if (org_gbtype == 3)
+		snprintf(tmp,MAX_LEN,MSG,"GBC",num_rwnd_states,byte2mb(max_rewind_memory));
 
-    renderer_set_msg(tmp);
+	renderer_set_msg(tmp);
 }

@@ -41,7 +41,11 @@ typedef struct
 	unsigned long color[4];
 	u8 bgbright;
 	char lastpath[256];
-	u32 user_max_rewind_memory;
+	u32 rewind_user_max_memory_ammount;
+	u8 rewind_always_use_max_memory;
+	u32 rewind_user_max_states_ammount;
+	u32 rewind_always_use_max_states;
+	u8 rewind_limit_mode;
 } SETTING;
 
 extern SETTING setting, tmpsetting;

@@ -100,18 +100,6 @@ int read_rewind_state(void){
 }
 
 //Papiex : Rewind extension
-#ifdef MAX_MEMORY_ESTIMATION
-static int checkIfButtonRepressed(){
-	int retVal = 0;
-	ctrl_data_t paddata;
-	sceCtrlPeekBufferPositive(&paddata, 1);
-	if((paddata.buttons & PSP_CTRL_LEFT)
-	   && (paddata.buttons & PSP_CTRL_START))
-	{
-		retVal = 1;
-	}
-	return retVal;
-}
 
 static unsigned checkAvailableMemoryBiggestSingleChunk(){
 	void* mem = NULL;
@@ -179,6 +167,19 @@ static unsigned checkAvailableMemoryMixedChunks(){
 	list_destroy(&head);
 	return retval;
 }
+#ifdef MAX_MEMORY_ESTIMATION
+
+static int checkIfButtonRepressed(){
+	int retVal = 0;
+	ctrl_data_t paddata;
+	sceCtrlPeekBufferPositive(&paddata, 1);
+	if((paddata.buttons & PSP_CTRL_LEFT)
+	   && (paddata.buttons & PSP_CTRL_START))
+	{
+		retVal = 1;
+	}
+	return retVal;
+}
 
 void test_available_memory(void){
 	static int testNumber=0;
@@ -202,4 +203,8 @@ void test_available_memory(void){
 unsigned establish_max_rewind_memory(void) {
     unsigned retval = checkAvailableMemoryBiggestSingleChunk() - SAFE_MEMORY_MARGIN;
     return retval;
+}
+
+unsigned get_current_rewind_memory(void) {
+    return 0;
 }
