@@ -1291,7 +1291,7 @@ static void change_value(u32* baseValue,int lowerBound,int upperBound,int step,i
 }
 
 static void rin_menu_rewind_get_config_save_value(SETTING* localSettings) {
-	memcpy(&setting,&localSettings, sizeof(SETTING));
+	memcpy(&setting,localSettings, sizeof(SETTING));
 }
 
 static int rin_menu_rewind_get_config_increase_row(const int MAX_ROW, int sel) {
