@@ -6,7 +6,7 @@ MODE=REL
 TARGET = rin_rm
 OBJS = gbcore/cpu.o gbcore/gb.o gbcore/lcd.o gbcore/sgb.o \
 	gbcore/rom.o gbcore/mbc.o gbcore/apu.o gbcore/cheat.o \
-	main.o pg.o renderer.o rewind.o menu.o filer.o sound.o saveload.o image.o gz.o tools.o
+	main.o pg.o renderer.o rewind.o menu.o filer.o sound.o saveload.o image.o gz.o tools.o menu_rewind.o
 
 INCDIR		=
 
