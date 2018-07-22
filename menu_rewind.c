@@ -69,11 +69,11 @@ static void change_selected_value(SETTING *local, int direction) {
 }
 
 static void change_value(u32* baseValue,int lowerBound,int upperBound,int step,int direction){
-	(*baseValue) += (REWIND_MEMORY_STEP*direction);
-	if((*baseValue) > REWIND_MAX_USER_MEMORY){
-		(*baseValue) = REWIND_MIN_USER_MEMORY;
-	} else if((*baseValue) < REWIND_MIN_USER_MEMORY){
-		(*baseValue) = REWIND_MAX_USER_MEMORY;
+	(*baseValue) += (step*direction);
+	if((*baseValue) > upperBound){
+		(*baseValue) = lowerBound;
+	} else if((*baseValue) <= lowerBound){
+		(*baseValue) = upperBound;
 	}
 }
 
@@ -168,11 +168,14 @@ static void rin_frame_rewind_no_max(){
 
 char *rin_menu_rewind_get_main_menu_string() {
 	static char buf[MAX_MENU_ENTRY_LENGTH] = {0};
+	char floatString[MAX_MENU_ENTRY_LENGTH] = {0};
 	if(setting.rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT) {
 		if(setting.rewind_always_use_max_memory){
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%uMB(no limit)",byte2mb(max_rewind_memory));
+			ftoa(byte2mb_asFloat(max_rewind_memory),floatString,1);
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%sMB(no limit)",floatString);
 		} else{
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%uMB(user limit)",byte2mb(setting.rewind_user_max_memory_ammount));
+			ftoa(byte2mb_asFloat(setting.rewind_user_max_memory_ammount),floatString,1);
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%sMB(user limit)",floatString);
 		}
 	}else{
 		if(setting.rewind_always_use_max_states){
@@ -192,6 +195,8 @@ void rin_menu_rewind_get_config(void) {
 		readpad();
 		if(new_pad & CTRL_CIRCLE){
 			rin_menu_rewind_get_config_save_value(&localSettings);
+			free_rewind_states();
+			allocate_rewind_states();
 			break;
 		}else if(new_pad & CTRL_CROSS){
 			break;
@@ -209,8 +214,7 @@ void rin_menu_rewind_get_config(void) {
 			}
 		}else if(new_pad & CTRL_LEFT){
 			if(sel == 0){
-				localSettings.rewind_limit_mode = (u8
-				)!localSettings.rewind_limit_mode;
+				localSettings.rewind_limit_mode = (u8)!localSettings.rewind_limit_mode;
 			}else if (sel == 1){
 				rin_menu_rewind_get_config_decrease_value(&localSettings);
 			}

@@ -4,6 +4,10 @@
 
 #ifndef RIN_TOOLS_H
 #define RIN_TOOLS_H
+
+#define MAX(a,b) (a)>=(b)?(a):(b)
+#define MIN(a,b) (a)<(b)?(a):(b)
+
 static inline unsigned byte2mb(unsigned bytes){
 	return bytes/1024/1024;
 }
