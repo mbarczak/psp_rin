@@ -21,6 +21,7 @@ static void rin_frame_rewind_no_max();
 static void change_selected_value(SETTING *local, int direction);
 static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
 static void print_rewind_states_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
+static void print_rewind_states_help(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
 static void rin_frame_rewind(SETTING *local);
 
 /*
@@ -108,6 +109,7 @@ void rin_menu_rewind_get_config_show_current(long sel,SETTING* local) {
 	}else{
 		print_rewind_states_limit_line(&x, &y, local, sel);
 	}
+	print_rewind_states_help(&x, &y,local,sel);
 	pgScreenFlipV();
 }
 void rin_frame_rewind(SETTING *local) {
@@ -135,6 +137,20 @@ static void print_rewind_states_limit_line(unsigned long *x, unsigned long *y, c
 	}
 	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
 	         "Prefered number of rewind states : %s",tmpString);
+}
+
+static void print_rewind_states_help(unsigned long *x, unsigned long *y, const SETTING *local, const long sel) {
+#define HELP_COLOR RGB(26, 163, 255)
+	char tmpString[MAX_MENU_ENTRY_LENGTH] = {0};
+	if(local->rewind_always_use_max_states){
+		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"Always use MAX");
+	}else{
+		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"%d states",local->rewind_user_max_states_ammount);
+	}
+	(*y)+= 6;
+	pgPrintf(*x,*y,HELP_COLOR, "---------------------------------------------------");
+	(*y)+= 1;
+	pgPrintf(*x,*y,HELP_COLOR, "");
 }
 
 static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel) {
