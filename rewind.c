@@ -64,7 +64,7 @@ static void set_number_of_rewind_states(int *number_of_states) {
 			(*number_of_states) = (int) ( (float)get_current_rewind_memory(setting) / (float) rwnd_state_size );
 			break;
 		case REWIND_MODE_LIMIT_STATES_AMOUNT:{
-			int max_states = (int) ( (float)get_current_rewind_memory(setting) / (float) rwnd_state_size );
+			int max_states = (int) ( (float)max_rewind_memory / (float) rwnd_state_size );
 			if(setting.rewind_always_use_max_states){
 				(*number_of_states) = max_states;
 			}else{
@@ -235,14 +235,22 @@ unsigned get_current_rewind_memory(SETTING local) {
 	}
     return retval;
 }
+
+char* get_current_rewind_memory_string(SETTING local){
+	static char* retval[10];
+	ftoa(byte2mb_asFloat(get_current_rewind_memory(local)),(char*)retval,1);
+	return (char*)retval;
+}
+
 void print_rewind_debug_info(SETTING local, char *info) {
 	printf("\nINFO TYPE : %s\n",info);
-
+	printf("\tGlobal current rewind memory    - get_current_rewind_memory()     : %d bytes / %d kb / %s mb\n",
+	       get_current_rewind_memory(local),byte2kb(get_current_rewind_memory(local)),get_current_rewind_memory_string(local));
 	printf("\tGlobal number of states         - num_rwnd_states                 : %d\n",num_rwnd_states);
 	printf("\tGlobal state size               - rwnd_state_size                 : %d bytes / %d kb\n",rwnd_state_size,byte2kb(rwnd_state_size));
 	char floatStringMaxRewindMemory[10] = {0};
 	ftoa(byte2mb_asFloat(max_rewind_memory),floatStringMaxRewindMemory,1);
-	printf("\tGlobal rewind memory            - max_rewind_memory               : %d bytes / %d kb / %s mb\n",
+	printf("\tGlobal max avail. rewind memory - max_rewind_memory               : %d bytes / %d kb / %s mb\n",
 	       max_rewind_memory,byte2kb(max_rewind_memory),floatStringMaxRewindMemory);
 	printf("\tRewind : limit mode             - rewind_limit_mode               : %s\n",local.rewind_limit_mode?"REWIND_MODE_LIMIT_STATES_AMOUNT":"REWIND_MODE_LIMIT_MEMORY_AMOUNT");
 	printf("\tRewind : always use max states  - rewind_always_use_max_states    : %d\n",local.rewind_always_use_max_states);
@@ -250,7 +258,7 @@ void print_rewind_debug_info(SETTING local, char *info) {
 	printf("\tRewind : always use max memory  - rewind_always_use_max_memory    : %d\n",local.rewind_always_use_max_memory);
 	char floatStringUserMaxRewindMemory[10] = {0};
 	ftoa(byte2mb_asFloat(local.rewind_user_max_memory_ammount),floatStringUserMaxRewindMemory,1);
-	printf("\tRewind : user max states amount - rewind_user_max_memory_ammount  : %d bytes / %d kb / %s mb\n\n",
+	printf("\tRewind : user max memory amount - rewind_user_max_memory_ammount  : %d bytes / %d kb / %s mb\n\n",
 	       local.rewind_user_max_memory_ammount,byte2kb(local.rewind_user_max_memory_ammount),floatStringUserMaxRewindMemory);
 
 

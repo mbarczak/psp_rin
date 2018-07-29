@@ -168,20 +168,17 @@ static void rin_frame_rewind_no_max(){
 
 char *rin_menu_rewind_get_main_menu_string() {
 	static char buf[MAX_MENU_ENTRY_LENGTH] = {0};
-	char floatString[MAX_MENU_ENTRY_LENGTH] = {0};
 	if(setting.rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT) {
 		if(setting.rewind_always_use_max_memory){
-			ftoa(byte2mb_asFloat(max_rewind_memory),floatString,1);
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%sMB(no limit)",floatString);
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory:no limit,using %sMB",get_current_rewind_memory_string(setting));
 		} else{
-			ftoa(byte2mb_asFloat(setting.rewind_user_max_memory_ammount),floatString,1);
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%sMB(user limit)",floatString);
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory:user limit,using %sMB",get_current_rewind_memory_string(setting));
 		}
 	}else{
 		if(setting.rewind_always_use_max_states){
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%u states(no limit)",setting.rewind_user_max_states_ammount);
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"States:no limit,using %u states",num_rwnd_states);
 		}else{
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"%u states(user limit)",num_rwnd_states);
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"States:user limit,using %u states",num_rwnd_states);
 		}
 	}
 	return buf;

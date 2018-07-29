@@ -1482,14 +1482,14 @@ extern int num_rwnd_states;
 extern unsigned max_rewind_memory;
 void showMsgAboutLoadedRom() {//TODO: Refactor 3 calls
 #define MAX_LEN 70
-#define MSG "ROM TYPE:%s, REWIND: going back %d steps (%d MB)"
+#define MSG "ROM TYPE:%s, REWIND: going back %d steps available"
 	char tmp[MAX_LEN]={0};
 	if(org_gbtype == 1)
-		snprintf(tmp,MAX_LEN,MSG,"GB",num_rwnd_states,byte2mb(max_rewind_memory));
+		snprintf(tmp,MAX_LEN,MSG,"GB",num_rwnd_states);
 	else if (org_gbtype == 2)
-		snprintf(tmp,MAX_LEN,MSG,"SGB",num_rwnd_states,byte2mb(max_rewind_memory));
+		snprintf(tmp,MAX_LEN,MSG,"SGB",num_rwnd_states);
 	else if (org_gbtype == 3)
-		snprintf(tmp,MAX_LEN,MSG,"GBC",num_rwnd_states,byte2mb(max_rewind_memory));
+		snprintf(tmp,MAX_LEN,MSG,"GBC",num_rwnd_states);
 
 	renderer_set_msg(tmp);
 }
