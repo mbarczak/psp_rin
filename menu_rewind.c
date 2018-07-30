@@ -13,7 +13,7 @@ static int rin_menu_rewind_get_config_increase_row(const int MAX_ROW, int sel);
 static void rin_menu_rewind_get_config_save_value(SETTING* localSettings);
 static void rin_menu_rewind_get_config_increase_value(SETTING* local);
 static void rin_menu_rewind_get_config_decrease_value(SETTING* local);
-static void rin_menu_rewind_get_config_show_current(long sel,SETTING* local);
+static void rin_menu_rewind_get_config_show_current(long sel,int* crs_count,SETTING* local);
 static void rin_menu_rewind_get_config_toogle_max(SETTING *local);
 static void change_value(u32 * baseValue,int lowerBound,int upperBound,int step,int direction);
 static void rin_frame_rewind_use_max();
@@ -95,10 +95,11 @@ static int rin_menu_rewind_get_config_decrease_row(const int MAX_ROW, int sel) {
 }
 
 static unsigned long rewind_get_text_color(const long sel,const int element) {
-	return setting.color[sel==element?2:3];
+//	return setting.color[sel==element?2:3];
+	return setting.color[3];
 }
 
-void rin_menu_rewind_get_config_show_current(long sel,SETTING* local) {
+void rin_menu_rewind_get_config_show_current(long sel,int* crs_count,SETTING* local) {
 
 	unsigned long x=4,y=5;
 	rin_frame_rewind(local);
@@ -111,8 +112,19 @@ void rin_menu_rewind_get_config_show_current(long sel,SETTING* local) {
 		print_rewind_states_limit_line(&x, &y, local, sel);
 	}
 	print_rewind_states_help(&x, &y,local,sel);
+	if ((*crs_count)++>=30) (*crs_count)=0;
+	if ((*crs_count) < 15) {
+		x = 3;
+		if (sel == 0) {
+			y = 5;
+		} else if (sel == 1) {
+			y = 7;
+		}
+		pgPutChar(x * 8, y * 8, setting.color[3], 0, 127, 1, 0, 1);
+	}
 	pgScreenFlipV();
 }
+
 void rin_frame_rewind(SETTING *local) {
 	if(local->rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT){
 		if(local->rewind_always_use_max_memory){
@@ -180,7 +192,7 @@ static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, c
 	ftoa(byte2mb_asFloat(max_rewind_memory),maxStr,1);
 
 	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
-	         "Preferred memory amount designed for rewind purposes");
+	         "Preferred memory amount designated for rewind purposes");
 	(*y)++;
 	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
 	         "(current max:%s MB): %s",maxStr,tmpString);
@@ -220,8 +232,11 @@ void rin_menu_rewind_get_config(void) {
 	SETTING localSettings;
 	memcpy(&localSettings,&setting, sizeof(SETTING));
 	long sel=0;
+	int crs_count=0;
 	for(;;){
 		readpad();
+		if(now_pad & (CTRL_UP|CTRL_DOWN|CTRL_LEFT|CTRL_RIGHT))
+			crs_count=0;
 		if(new_pad & CTRL_CIRCLE){
 			rin_menu_rewind_get_config_save_value(&localSettings);
 			free_rewind_states();
@@ -248,6 +263,6 @@ void rin_menu_rewind_get_config(void) {
 				rin_menu_rewind_get_config_decrease_value(&localSettings);
 			}
 		}
-		rin_menu_rewind_get_config_show_current(sel,&localSettings);
+		rin_menu_rewind_get_config_show_current(sel,&crs_count,&localSettings);
 	}
 }
