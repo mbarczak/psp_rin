@@ -1,0 +1,3 @@
+#!/usr/local/pspdev/bin/pspsh
+reset
+./rin_rm.elf
