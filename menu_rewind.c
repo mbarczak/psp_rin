@@ -18,11 +18,12 @@ static void rin_menu_rewind_get_config_toogle_max(SETTING *local);
 static void change_value(u32 * baseValue,int lowerBound,int upperBound,int step,int direction);
 static void rin_frame_rewind_use_max();
 static void rin_frame_rewind_no_max();
+static void rin_frame_rewind_change_mode();
 static void change_selected_value(SETTING *local, int direction);
 static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
 static void print_rewind_states_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
 static void print_rewind_states_help(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
-static void rin_frame_rewind(SETTING *local);
+static void rin_frame_rewind(SETTING *local, long sel);
 
 /*
  *
@@ -102,7 +103,7 @@ static unsigned long rewind_get_text_color(const long sel,const int element) {
 void rin_menu_rewind_get_config_show_current(long sel,int* crs_count,SETTING* local) {
 
 	unsigned long x=4,y=5;
-	rin_frame_rewind(local);
+	rin_frame_rewind(local, sel);
 	pgPrintf(x,y++,rewind_get_text_color(sel,0),"Limit mode : %s",
 	         local->rewind_limit_mode==REWIND_MODE_LIMIT_MEMORY_AMOUNT?"by memory amount":"by number of states");
 	y++;
@@ -125,18 +126,22 @@ void rin_menu_rewind_get_config_show_current(long sel,int* crs_count,SETTING* lo
 	pgScreenFlipV();
 }
 
-void rin_frame_rewind(SETTING *local) {
-	if(local->rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT){
-		if(local->rewind_always_use_max_memory){
-			rin_frame_rewind_use_max();
-		}else{
-			rin_frame_rewind_no_max();
-		}
+void rin_frame_rewind(SETTING *local, long sel) {
+	if(sel == 0){
+		rin_frame_rewind_change_mode();
 	}else{
-		if(local->rewind_always_use_max_states){
-			rin_frame_rewind_use_max();
+		if(local->rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT){
+			if(local->rewind_always_use_max_memory){
+				rin_frame_rewind_use_max();
+			}else{
+				rin_frame_rewind_no_max();
+			}
 		}else{
-			rin_frame_rewind_no_max();
+			if(local->rewind_always_use_max_states){
+				rin_frame_rewind_use_max();
+			}else{
+				rin_frame_rewind_no_max();
+			}
 		}
 	}
 }
@@ -192,7 +197,7 @@ static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, c
 	ftoa(byte2mb_asFloat(max_rewind_memory),maxStr,1);
 
 	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
-	         "Preferred memory amount designated for rewind purposes");
+	         "Preferred memory amount designated for rewind");
 	(*y)++;
 	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
 	         "(current max:%s MB): %s",maxStr,tmpString);
@@ -208,6 +213,10 @@ static void rin_frame_rewind_use_max() {
 
 static void rin_frame_rewind_no_max(){
 	rin_frame(rin_frame_get_title(),"□：Use max <-：Sub ->：Add　×：Cancel ○：Save ");
+}
+
+static void rin_frame_rewind_change_mode(){
+	rin_frame(rin_frame_get_title(),"<- ->：Change limit mode ×：Cancel ○：Save ");
 }
 
 char *rin_menu_rewind_get_main_menu_string() {
@@ -245,7 +254,9 @@ void rin_menu_rewind_get_config(void) {
 		}else if(new_pad & CTRL_CROSS){
 			break;
 		}else if(new_pad & CTRL_SQUARE){
-			rin_menu_rewind_get_config_toogle_max(&localSettings);
+			if(sel == 1 ) {
+				rin_menu_rewind_get_config_toogle_max(&localSettings);
+			}
 		}else if(new_pad & CTRL_DOWN){
 			sel = rin_menu_rewind_get_config_decrease_row(MAX_ROW, sel);
 		}else if(new_pad & CTRL_UP){
