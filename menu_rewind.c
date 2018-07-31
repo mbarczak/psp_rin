@@ -11,15 +11,15 @@
 static int rin_menu_rewind_get_config_decrease_row(const int MAX_ROW, int sel);
 static int rin_menu_rewind_get_config_increase_row(const int MAX_ROW, int sel);
 static void rin_menu_rewind_get_config_save_value(SETTING* localSettings);
-static void rin_menu_rewind_get_config_increase_value(SETTING* local);
-static void rin_menu_rewind_get_config_decrease_value(SETTING* local);
+static void rin_menu_rewind_get_config_increase_value(SETTING *local, short longStep);
+static void rin_menu_rewind_get_config_decrease_value(SETTING *local, short longStep);
 static void rin_menu_rewind_get_config_show_current(long sel,int* crs_count,SETTING* local);
 static void rin_menu_rewind_get_config_toogle_max(SETTING *local);
-static void change_value(u32 * baseValue,int lowerBound,int upperBound,int step,int direction);
+static void change_value(u32 *baseValue, u32 lowerBound, u32 upperBound, int step, int direction);
 static void rin_frame_rewind_use_max();
 static void rin_frame_rewind_no_max();
 static void rin_frame_rewind_change_mode();
-static void change_selected_value(SETTING *local, int direction);
+static void change_selected_value(SETTING *local, int direction, short longStep);
 static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
 static void print_rewind_states_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
 static void print_rewind_states_help(unsigned long *x, unsigned long *y, const SETTING *local, const long sel);
@@ -46,31 +46,33 @@ static void rin_menu_rewind_get_config_toogle_max(SETTING *local) {
 	}
 }
 
-#define REWIND_MEMORY_STEP ((int)(0.5 * 1024 *1024))
+#define REWIND_MEMORY_STEP ((int)(1 * 1024 *1024))
 #define REWIND_STATES_STEP 10
+#define REWIND_MEMORY_STEP_SLOW ((int)(0.1 * 1024 *1024))
+#define REWIND_STATES_STEP_SLOW 1
 
-static void rin_menu_rewind_get_config_decrease_value(SETTING* local) {
-	change_selected_value(local, -1);
+static void rin_menu_rewind_get_config_decrease_value(SETTING *local, short longStep) {
+	change_selected_value(local, -1, longStep);
 }
-static void rin_menu_rewind_get_config_increase_value(SETTING* local) {
-	change_selected_value(local, 1);
+static void rin_menu_rewind_get_config_increase_value(SETTING *local, short longStep) {
+	change_selected_value(local, 1, longStep);
 }
 
-static void change_selected_value(SETTING *local, int direction) {
+static void change_selected_value(SETTING *local, int direction, short longStep) {
 	if(local->rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT){
 		if(!local->rewind_always_use_max_memory){
 			change_value(&local->rewind_user_max_memory_ammount,REWIND_MIN_USER_MEMORY,
-			             REWIND_MAX_USER_MEMORY,REWIND_MEMORY_STEP,direction);
+			             REWIND_MAX_USER_MEMORY,longStep?REWIND_MEMORY_STEP:REWIND_MEMORY_STEP_SLOW,direction);
 		}
 	}else{
 		if(!local->rewind_always_use_max_states){
 			change_value(&local->rewind_user_max_states_ammount,REWIND_MIN_USER_STATES,
-			             REWIND_MAX_USER_STATES,REWIND_STATES_STEP,direction);
+			             REWIND_MAX_USER_STATES,longStep?REWIND_STATES_STEP:REWIND_STATES_STEP_SLOW,direction);
 		}
 	}
 }
 
-static void change_value(u32* baseValue,int lowerBound,int upperBound,int step,int direction){
+static void change_value(u32 *baseValue, u32 lowerBound, u32 upperBound, int step, int direction){
 	(*baseValue) += (step*direction);
 	if((*baseValue) > upperBound){
 		(*baseValue) = lowerBound;
@@ -149,12 +151,12 @@ void rin_frame_rewind(SETTING *local, long sel) {
 static void print_rewind_states_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel) {
 	char tmpString[MAX_MENU_ENTRY_LENGTH] = {0};
 	if(local->rewind_always_use_max_states){
-		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"Always use MAX");
+		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"Always use max");
 	}else{
 		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"%d states",local->rewind_user_max_states_ammount);
 	}
 	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
-	         "Preferred number of rewind states : %s",tmpString);
+	         "Preferred number of rewind states: %s",tmpString);
 }
 
 static void print_rewind_states_help(unsigned long *x, unsigned long *y, const SETTING *local, const long sel) {
@@ -163,7 +165,7 @@ static void print_rewind_states_help(unsigned long *x, unsigned long *y, const S
 	unsigned help_x = 4;
 	char tmpString[MAX_MENU_ENTRY_LENGTH] = {0};
 	if(local->rewind_always_use_max_states){
-		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"Always use MAX");
+		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"Always use max");
 	}else{
 		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"%d states",local->rewind_user_max_states_ammount);
 	}
@@ -188,11 +190,11 @@ static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, c
 	char maxStr[MAX_MENU_ENTRY_LENGTH] = {0};
 
 	if(local->rewind_always_use_max_memory){
-		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"Always use MAX");
+		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"Always use max");
 	}else{
 		float num = byte2mb_asFloat(local->rewind_user_max_memory_ammount);
 		ftoa(num,tmpString,1);
-		strcat(tmpString,"mb");
+		strcat(tmpString," MB");
 	}
 	ftoa(byte2mb_asFloat(max_rewind_memory),maxStr,1);
 
@@ -200,7 +202,7 @@ static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, c
 	         "Preferred memory amount designated for rewind");
 	(*y)++;
 	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
-	         "(current max:%s MB): %s",maxStr,tmpString);
+	         "(current max: %s MB): %s",maxStr,tmpString);
 }
 
 static char* rin_frame_get_title(){
@@ -208,30 +210,30 @@ static char* rin_frame_get_title(){
 }
 
 static void rin_frame_rewind_use_max() {
-	rin_frame(rin_frame_get_title(),"□：Don't Use max ×：Cancel ○：Save ");
+	rin_frame(rin_frame_get_title(),"□：Don't use max ×：Cancel ○：Save ");
 }
 
 static void rin_frame_rewind_no_max(){
-	rin_frame(rin_frame_get_title(),"□：Use max <-：Sub ->：Add　×：Cancel ○：Save ");
+	rin_frame(rin_frame_get_title(),"□：Use max ←：Sub →：Add　△:(press) Fine tune ×：Cancel ○：Save ");
 }
 
 static void rin_frame_rewind_change_mode(){
-	rin_frame(rin_frame_get_title(),"<- ->：Change limit mode ×：Cancel ○：Save ");
+	rin_frame(rin_frame_get_title(),"←→：Change limit mode ×：Cancel ○：Save ");
 }
 
 char *rin_menu_rewind_get_main_menu_string() {
 	static char buf[MAX_MENU_ENTRY_LENGTH] = {0};
 	if(setting.rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT) {
 		if(setting.rewind_always_use_max_memory){
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory:no limit,using %sMB",get_current_rewind_memory_string(setting));
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory: no limit, using %s MB",get_current_rewind_memory_string(setting));
 		} else{
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory:user limit,using %sMB",get_current_rewind_memory_string(setting));
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory: user limit,u sing %s MB",get_current_rewind_memory_string(setting));
 		}
 	}else{
 		if(setting.rewind_always_use_max_states){
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"States:no limit,using %u states",num_rwnd_states);
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"States: no limit, using %u states",num_rwnd_states);
 		}else{
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"States:user limit,using %u states",num_rwnd_states);
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"States: user limit, using %u states",num_rwnd_states);
 		}
 	}
 	return buf;
@@ -242,10 +244,16 @@ void rin_menu_rewind_get_config(void) {
 	memcpy(&localSettings,&setting, sizeof(SETTING));
 	long sel=0;
 	int crs_count=0;
+	short longStep = 1;
 	for(;;){
 		readpad();
 		if(now_pad & (CTRL_UP|CTRL_DOWN|CTRL_LEFT|CTRL_RIGHT))
 			crs_count=0;
+		if(now_pad & (CTRL_TRIANGLE)){
+			longStep = 0;
+		}else{
+			longStep = 1;
+		}
 		if(new_pad & CTRL_CIRCLE){
 			rin_menu_rewind_get_config_save_value(&localSettings);
 			free_rewind_states();
@@ -265,13 +273,13 @@ void rin_menu_rewind_get_config(void) {
 			if(sel == 0){
 				localSettings.rewind_limit_mode = (u8)!localSettings.rewind_limit_mode;
 			}else if (sel == 1){
-				rin_menu_rewind_get_config_increase_value(&localSettings);
+				rin_menu_rewind_get_config_increase_value(&localSettings, longStep);
 			}
 		}else if(new_pad & CTRL_LEFT){
 			if(sel == 0){
 				localSettings.rewind_limit_mode = (u8)!localSettings.rewind_limit_mode;
 			}else if (sel == 1){
-				rin_menu_rewind_get_config_decrease_value(&localSettings);
+				rin_menu_rewind_get_config_decrease_value(&localSettings, longStep);
 			}
 		}
 		rin_menu_rewind_get_config_show_current(sel,&crs_count,&localSettings);
