@@ -15,7 +15,7 @@ static void rin_menu_rewind_get_config_increase_value(SETTING *local, short long
 static void rin_menu_rewind_get_config_decrease_value(SETTING *local, short longStep);
 static void rin_menu_rewind_get_config_show_current(long sel,int* crs_count,SETTING* local);
 static void rin_menu_rewind_get_config_toogle_max(SETTING *local);
-static void change_value(u32 *baseValue, u32 lowerBound, u32 upperBound, int step, int direction);
+static void change_value(u32 *baseValue, int lowerBound, int upperBound, int step, int direction);
 static void rin_frame_rewind_use_max();
 static void rin_frame_rewind_no_max();
 static void rin_frame_rewind_change_mode();
@@ -72,13 +72,15 @@ static void change_selected_value(SETTING *local, int direction, short longStep)
 	}
 }
 
-static void change_value(u32 *baseValue, u32 lowerBound, u32 upperBound, int step, int direction){
-	(*baseValue) += (step*direction);
-	if((*baseValue) > upperBound){
-		(*baseValue) = lowerBound;
-	} else if((*baseValue) <= lowerBound){
-		(*baseValue) = upperBound;
+static void change_value(u32 *baseValue, int lowerBound, int upperBound, int step, int direction){
+	int bv = (*baseValue);
+	bv += (step*direction);
+	if(bv > upperBound){
+		bv = lowerBound;
+	} else if(bv < lowerBound){
+		bv = upperBound;
 	}
+	(*baseValue) = (u32)bv;
 }
 
 static void rin_menu_rewind_get_config_save_value(SETTING* localSettings) {
