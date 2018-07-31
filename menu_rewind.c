@@ -28,12 +28,12 @@ static void rin_frame_rewind(SETTING *local, long sel);
 /*
  *
  * 0 : Limit mode : memory amount
- * 1 : Prefered memory amount designed for rewind purposes (current max: 23mb): 9mb | Always use MAX
+ * 1 : Preferred memory amount designed for rewind purposes (current max: 23mb): 9mb | Always use MAX
  *    rin_frame("□：Don't Use max ×：Cancel ○：Save ");
  *    rin_frame("□：Use max <-：Sub ->：Add　×：Cancel ○：Save ");
  *
  * 0 : Limit mode : number of states
- * 1 : Prefered number of rewind states : 10 states | Always use MAX
+ * 1 : Preferred number of rewind states : 10 states | Always use MAX
  *    rin_frame("□：Don't Use max ×：Cancel ○：Save ");
  *    rin_frame("□：Use max <-：Sub ->：Add　×：Cancel ○：Save ");
  */
@@ -154,7 +154,7 @@ static void print_rewind_states_limit_line(unsigned long *x, unsigned long *y, c
 		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"%d states",local->rewind_user_max_states_ammount);
 	}
 	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
-	         "Prefered number of rewind states : %s",tmpString);
+	         "Preferred number of rewind states : %s",tmpString);
 }
 
 static void print_rewind_states_help(unsigned long *x, unsigned long *y, const SETTING *local, const long sel) {
