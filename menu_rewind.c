@@ -225,9 +225,11 @@ static void rin_frame_rewind_change_mode(){
 
 char *rin_menu_rewind_get_main_menu_string() {
 	static char buf[MAX_MENU_ENTRY_LENGTH] = {0};
+#if 0
 	if(setting.rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT) {
 		if(setting.rewind_always_use_max_memory){
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory: no limit, using %s MB",get_current_rewind_memory_string(setting));
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory in use %s MB (%d states for current rom)",
+					get_current_rewind_memory_string(setting),num_rwnd_states);
 		} else{
 			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory: user limit, using %s MB",get_current_rewind_memory_string(setting));
 		}
@@ -238,6 +240,10 @@ char *rin_menu_rewind_get_main_menu_string() {
 			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"States: user limit, using %u states",num_rwnd_states);
 		}
 	}
+#endif
+	snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Using %sMB (current rom: %d states)",
+	         get_current_rewind_memory_string(setting),num_rwnd_states);
+
 	return buf;
 }
 void rin_menu_rewind_get_config(void) {
