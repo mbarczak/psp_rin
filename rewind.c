@@ -228,10 +228,14 @@ unsigned establish_max_rewind_memory(void) {
 
 unsigned get_current_rewind_memory(SETTING local) {
 	unsigned retval;
-	if(local.rewind_always_use_max_memory){
-		retval = max_rewind_memory;
-	}else{
-		retval = MIN(local.rewind_user_max_memory_ammount,max_rewind_memory);
+	if(local.rewind_limit_mode == REWIND_MODE_LIMIT_MEMORY_AMOUNT){
+		if(local.rewind_always_use_max_memory){
+			retval = max_rewind_memory;
+		}else{
+			retval = MIN(local.rewind_user_max_memory_ammount,max_rewind_memory);
+		}
+	}else{//just informative estimation for displaying in menu
+		retval = num_rwnd_states * (sizeof(struct rewind_state)+rwnd_state_size);
 	}
     return retval;
 }

@@ -6,6 +6,8 @@
 
 #include<stdio.h>
 #include<math.h>
+#include <memory.h>
+
 //https://www.geeksforgeeks.org/convert-floating-point-number-string/
 // reverses a string 'str' of length 'len'
 void reverse(char *str, int len)
@@ -67,7 +69,7 @@ void ftoa(float n, char *res, int afterpoint)
 	float fpart = n - (float)ipart;
 
 	// convert integer part to string
-	int i = intToStr(ipart, res, 0);
+	int i = intToStr(ipart, res, 1);
 
 	// check for display option after point
 	if (afterpoint != 0)
@@ -81,4 +83,8 @@ void ftoa(float n, char *res, int afterpoint)
 
 		intToStr((int)fpart, res + i + 1, afterpoint);
 	}
+//	if(!strcmp(res,"0.0")){
+//		res[0]='0';
+//		res[1]='\0';
+//	}
 }

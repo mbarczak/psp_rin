@@ -229,7 +229,7 @@ char *rin_menu_rewind_get_main_menu_string() {
 		if(setting.rewind_always_use_max_memory){
 			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory: no limit, using %s MB",get_current_rewind_memory_string(setting));
 		} else{
-			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory: user limit,u sing %s MB",get_current_rewind_memory_string(setting));
+			snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Memory: user limit, using %s MB",get_current_rewind_memory_string(setting));
 		}
 	}else{
 		if(setting.rewind_always_use_max_states){
