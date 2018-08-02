@@ -1479,18 +1479,22 @@ void rin_menu(void)
 	border_uploaded = 2;
 }
 
-extern int num_rwnd_states;
-extern unsigned max_rewind_memory;
-void showMsgAboutLoadedRom() {//TODO: Refactor 3 calls
-#define MAX_LEN 70
-#define MSG "ROM TYPE:%s, REWIND: going back %d states available"
-	char tmp[MAX_LEN]={0};
-	if(org_gbtype == 1)
-		snprintf(tmp,MAX_LEN,MSG,"GB",num_rwnd_states);
-	else if (org_gbtype == 2)
-		snprintf(tmp,MAX_LEN,MSG,"SGB",num_rwnd_states);
-	else if (org_gbtype == 3)
-		snprintf(tmp,MAX_LEN,MSG,"GBC",num_rwnd_states);
+static char* gbType2Str(){
+	switch(org_gbtype){
+		case 1: return "GB";
+		case 2: return "SGB";
+		case 3: return "GBC";
+		default: return "Unknown";
+	}
+}
 
+void showMsgAboutLoadedRom() {
+#define MAX_LEN 70
+	char tmp[MAX_LEN]={0};
+	if(setting.rewind_enabled){
+		snprintf(tmp,MAX_LEN,"ROM TYPE:%s, REWIND: going back %d states available",gbType2Str(),num_rwnd_states);
+	}else{
+		snprintf(tmp,MAX_LEN,"ROM TYPE:%s, REWIND: disabled",gbType2Str());
+	}
 	renderer_set_msg(tmp);
 }

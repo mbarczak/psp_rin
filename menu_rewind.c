@@ -256,7 +256,7 @@ char *rin_menu_rewind_get_main_menu_string() {
 	}
 #endif
 	if(setting.rewind_enabled){
-		snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Using %sMB (current rom: %d states)",
+		snprintf(buf,MAX_MENU_ENTRY_LENGTH,"RAM used: %sMB (holds %d states)",
 		         get_current_rewind_memory_string(setting),num_rwnd_states);
 	}else{
 		snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Disabled");
