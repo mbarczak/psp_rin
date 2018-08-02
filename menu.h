@@ -18,7 +18,7 @@ typedef struct
 } S_BUTTON;
 
 #define VERRIN "1.32 RM mod v2"
-#define VERCNF "RINv1.31_rmv1"
+#define VERCNF "RINv1.31_rmv2"
 
 typedef struct
 {
@@ -46,6 +46,7 @@ typedef struct
 	u32 rewind_user_max_states_ammount;
 	u32 rewind_always_use_max_states;
 	u8 rewind_limit_mode;
+	u8 rewind_enabled;
 } SETTING;
 
 extern SETTING setting, tmpsetting;

@@ -73,6 +73,7 @@ void init_config()
 	setting.rewind_always_use_max_memory = 1;
 	setting.rewind_always_use_max_states = 1;
 	setting.rewind_limit_mode = REWIND_MODE_LIMIT_MEMORY_AMOUNT;
+	setting.rewind_enabled = 1;
 }
 
 void check_config()

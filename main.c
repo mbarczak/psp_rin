@@ -194,13 +194,14 @@ void mainloop(void)
 		}
 		pgScreenFlip();
 #else
+		if(setting.rewind_enabled){
+			framecount++;
 
-		framecount++;
-		
-		//davex
-		if( framecount ==  save_period_frames){
-			save_rewind_state();
-			framecount = 0;
+			//davex
+			if( framecount ==  save_period_frames){
+				save_rewind_state();
+				framecount = 0;
+			}
 		}
 
 
@@ -253,42 +254,42 @@ void mainloop(void)
 		}
 #endif
 	
+		if(setting.rewind_enabled){
+			//>>>davex: rewind check
+			sceCtrlPeekBufferPositive(&paddata, 1);
+			if( get_nShortcutKey(paddata.buttons) == 8 ){ // 8 == REWIND_SHORTCUT KEY
 
-		//>>>davex: rewind check
-		sceCtrlPeekBufferPositive(&paddata, 1);
-		if( get_nShortcutKey(paddata.buttons) == 8 ){ // 8 == REWIND_SHORTCUT KEY
-	
-			wavout_enable=0; 
-			
-			while(1){
-				
-				//begin rewinds
-				if( read_rewind_state() > 0 ){
-					
-					for(line=0; line<154; line++) //emulate a frame
-						gb_run();
-							
-					pgScreenFlip();
+				wavout_enable=0;
+
+				while(1){
+
+					//begin rewinds
+					if( read_rewind_state() > 0 ){
+
+						for(line=0; line<154; line++) //emulate a frame
+							gb_run();
+
+						pgScreenFlip();
+					}
+
+					sceKernelDelayThread(WAIT_MILIS);
+
+
+					sceCtrlPeekBufferPositive(&paddata, 1);
+					if( get_nShortcutKey(paddata.buttons) != 8 )
+						break;
+
 				}
-				
-				sceKernelDelayThread(WAIT_MILIS);
-				
 
-				sceCtrlPeekBufferPositive(&paddata, 1);
-				if( get_nShortcutKey(paddata.buttons) != 8 )
-					break;
-				
+				//continue normal emulation
+				if(setting.sound) wavout_enable=1;
+				cur_time = sceKernelLibcClock();
+				prev_time = cur_time;
+				next_time = cur_time + sync_time;
+				skip=0;
 			}
-			
-			//continue normal emulation
-			if(setting.sound) wavout_enable=1;
-			cur_time = sceKernelLibcClock();
-			prev_time = cur_time;
-			next_time = cur_time + sync_time;
-			skip=0;
+			//<<<
 		}
-		//<<<
-		
 		// ƒƒjƒ…[
 		if(bMenu){
 			wavout_enable=0;

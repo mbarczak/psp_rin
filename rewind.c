@@ -29,32 +29,35 @@ struct rewind_state *ptr_rewind_states, *prev_state, *next_state;
 static void set_number_of_rewind_states(int *number_of_states);
 
 void allocate_rewind_states(void){
-	struct rewind_state *created_state, *first_state;
-	int i;
-	rwnd_state_size = gb_save_state(NULL);  //declared in "gbcore/gb.h"
-	set_number_of_rewind_states(&num_rwnd_states);
-	//reserves first state
-	created_state =  (struct rewind_state *)malloc( sizeof(struct rewind_state) );
-	created_state->have_data = 0;
-	created_state->data = (byte *) malloc( rwnd_state_size);
-	first_state = created_state;
-	prev_state = first_state;
-	
-	//reserves remaining states
-	for( i = 1; i< num_rwnd_states; i++){
-		created_state  = (struct rewind_state *)malloc( sizeof(struct rewind_state) );
+	if(setting.rewind_enabled){
+		struct rewind_state *created_state, *first_state;
+		int i;
+		rwnd_state_size = gb_save_state(NULL);  //declared in "gbcore/gb.h"
+		set_number_of_rewind_states(&num_rwnd_states);
+		//reserves first state
+		created_state =  (struct rewind_state *)malloc( sizeof(struct rewind_state) );
 		created_state->have_data = 0;
 		created_state->data = (byte *) malloc( rwnd_state_size);
-		created_state ->prev = prev_state;
-		prev_state->next = created_state;
-		prev_state = created_state;
+		first_state = created_state;
+		prev_state = first_state;
+
+		//reserves remaining states
+		for( i = 1; i< num_rwnd_states; i++){
+			created_state  = (struct rewind_state *)malloc( sizeof(struct rewind_state) );
+			created_state->have_data = 0;
+			created_state->data = (byte *) malloc( rwnd_state_size);
+			created_state ->prev = prev_state;
+			prev_state->next = created_state;
+			prev_state = created_state;
+		}
+
+
+		//make list be circular
+		created_state->next = first_state;
+		first_state->prev = created_state;
+		ptr_rewind_states = first_state;
 	}
-	
-	
-	//make list be circular
-	created_state->next = first_state; 
-	first_state->prev = created_state; 
-	ptr_rewind_states = first_state;
+
 	print_rewind_debug_info(setting,"allocate_rewind_states");
 }
 
@@ -94,6 +97,7 @@ void free_rewind_states(void){
             free(now_state);
             now_state = next_state;
         }
+        ptr_rewind_states = NULL;
 	}
 }
 
@@ -256,6 +260,7 @@ void print_rewind_debug_info(SETTING local, char *info) {
 	ftoa(byte2mb_asFloat(max_rewind_memory),floatStringMaxRewindMemory,1);
 	printf("\tGlobal max avail. rewind memory - max_rewind_memory               : %d bytes / %d kb / %s mb\n",
 	       max_rewind_memory,byte2kb(max_rewind_memory),floatStringMaxRewindMemory);
+	printf("\tRewind : enabled                - rewind_enabled                  : %d\n",local.rewind_enabled);
 	printf("\tRewind : limit mode             - rewind_limit_mode               : %s\n",local.rewind_limit_mode?"REWIND_MODE_LIMIT_STATES_AMOUNT":"REWIND_MODE_LIMIT_MEMORY_AMOUNT");
 	printf("\tRewind : always use max states  - rewind_always_use_max_states    : %d\n",local.rewind_always_use_max_states);
 	printf("\tRewind : user max states amount - rewind_user_max_states_ammount  : %d\n",local.rewind_user_max_states_ammount);
