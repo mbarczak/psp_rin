@@ -199,22 +199,17 @@ static void print_rewind_states_help(unsigned long *x, unsigned long *y, const S
 
 static void print_rewind_memory_limit_line(unsigned long *x, unsigned long *y, const SETTING *local, const long sel) {
 	char tmpString[MAX_MENU_ENTRY_LENGTH] = {0};
-	char maxStr[MAX_MENU_ENTRY_LENGTH] = {0};
 
 	if(local->rewind_always_use_max_memory){
 		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"Always use max");
 	}else{
-		float num = byte2mb_asFloat(local->rewind_user_max_memory_ammount);
-		ftoa(num,tmpString,1);
-		strcat(tmpString," MB");
+		snprintf(tmpString,MAX_MENU_ENTRY_LENGTH,"%.1f MB",byte2mb_asFloat(local->rewind_user_max_memory_ammount));
 	}
-	ftoa(byte2mb_asFloat(max_rewind_memory),maxStr,1);
-
 	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
 	         "Preferred memory amount designated for rewind");
 	(*y)++;
 	pgPrintf(*x,*y,rewind_get_text_color(sel,1),
-	         "(current max: %s MB): %s",maxStr,tmpString);
+	         "(current max: %.1f MB): %s",byte2mb_asFloat(max_rewind_memory),tmpString);
 }
 
 static char* rin_frame_get_title(){
@@ -256,8 +251,8 @@ char *rin_menu_rewind_get_main_menu_string() {
 	}
 #endif
 	if(setting.rewind_enabled){
-		snprintf(buf,MAX_MENU_ENTRY_LENGTH,"RAM used: %sMB (holds %d states)",
-		         get_current_rewind_memory_string(setting),num_rwnd_states);
+		snprintf(buf,MAX_MENU_ENTRY_LENGTH,"RAM used: %.1fMB (holds %d states)",
+		         byte2mb_asFloat(get_current_rewind_memory(setting)),num_rwnd_states);
 	}else{
 		snprintf(buf,MAX_MENU_ENTRY_LENGTH,"Disabled");
 	}

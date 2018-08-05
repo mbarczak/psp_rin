@@ -37,7 +37,6 @@ void test_available_memory(void);
 #endif
 unsigned establish_max_rewind_memory(void);
 unsigned get_current_rewind_memory(SETTING local);
-char* get_current_rewind_memory_string(SETTING local);
 void print_rewind_debug_info(SETTING local,char* info);
 
 #endif
