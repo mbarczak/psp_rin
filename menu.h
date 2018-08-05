@@ -17,7 +17,7 @@ typedef struct
 	int n;
 } S_BUTTON;
 
-#define VERRIN "1.32 RM mod v2"
+#define VERRIN "1.32 RM v2"
 #define VERCNF "RINv1.31_rmv2"
 
 typedef struct

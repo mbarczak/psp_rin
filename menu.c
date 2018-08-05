@@ -5,6 +5,7 @@
 #include "menu.h"
 #include "rewind.h"
 #include "menu_rewind.h"
+#include "menu_credits.h"
 
 SETTING setting, tmpsetting;
 int bTurbo=0, bBitmap;
@@ -1190,6 +1191,7 @@ void rin_menu(void)
 		KEY_CONFIG,
 		LOAD_CHEAT,
 		SELECT_CHEAT,
+		CREDITS,
 		LOAD_ROM,
 		RESET,
 		CONTINUE,
@@ -1373,6 +1375,10 @@ void rin_menu(void)
 				}
 				crs_count=0;
 				break;
+			case CREDITS:
+				rin_menu_credits();
+				crs_count=0;
+				break;
 			case RESET:
 				gb_reset();
 				bTurbo = 0;
@@ -1409,8 +1415,11 @@ void rin_menu(void)
 				sel=SCREEN_SIZE;
 			else if(sel<LOAD_CHEAT)
 				sel=LOAD_CHEAT;
-			else if(sel<LOAD_ROM)
-				sel=LOAD_ROM;
+			else if(sel<CREDITS)
+				sel=CREDITS;
+		}else if(new_pad & CTRL_TRIANGLE){
+			rin_menu_credits();
+			crs_count=0;
 		}else if(get_nShortcutKey(new_pad)==6){
 			bLoop = 0;
 			break;
@@ -1419,10 +1428,10 @@ void rin_menu(void)
 		if(!bLoop) break;
 		if (crs_count++>=30) crs_count=0;
 
-		rin_frame(msg, "○：OK  ×：Continue  MenuBTN：Continue");
+		rin_frame(msg, "○：OK  ×：Continue  MenuBTN：Continue  △: Credits");
 
 		x = 4;
-		y = 5;
+		y = 4;
 
 		pgPrintf(x,y++,setting.color[3],"STATE SAVE");
 		pgPrintf(x,y++,setting.color[3],"STATE LOAD");
@@ -1449,15 +1458,17 @@ void rin_menu(void)
 		pgPrintf(x,y++,setting.color[3],"Load Cheat File");
 		pgPrintf(x,y++,setting.color[nCheats>0?3:2],"Select Cheatcode");
 		y++;
+		pgPrintf(x,y++,setting.color[3],"Credits");
 		pgPrintf(x,y++,setting.color[3],"Back to ROM list");
 		pgPrintf(x,y++,setting.color[3],"Reset");
 		pgPrintf(x,y++,setting.color[3],"Continue");
 
 		if(crs_count < 15){
-			y = sel + 5;
+			y = sel + 4;
 			if(sel >= SCREEN_SIZE)	y++;
 			if(sel >= LOAD_CHEAT)	y++;
-			if(sel >= LOAD_ROM)		y++;
+			if(sel >= CREDITS)		y++;
+
 			tmp[0]=127; tmp[1]=0;
 			pgPrintf(x-1,y,setting.color[3],tmp);
 		}

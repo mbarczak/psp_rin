@@ -27,5 +27,5 @@ set(return_list ".")
 
 
 
-add_executable(rin ${all_src} tools.c tools.h menu_rewind.c menu_rewind.h)
+add_executable(rin ${all_src} tools.c tools.h menu_rewind.c menu_rewind.h menu_credits.c menu_credits.h)
 set_target_properties(rin PROPERTIES LINKER_LANGUAGE CXX)
