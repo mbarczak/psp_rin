@@ -77,7 +77,10 @@ void gb_init(void)
 void gb_reset()
 {
 	set_gb_type();
-	
+
+	free_rewind_states();
+	allocate_rewind_states();
+
 	g_regs.SC=0;
 	g_regs.DIV=0;
 	g_regs.TIMA=0;
@@ -114,7 +117,6 @@ void gb_reset()
 	now_frame=0;
 	skip=skip_buf=0;
 	re_render=0;
-	
 //	char *gb_names[]={"Invalid","Gameboy","SuperGameboy","Gameboy Color","Gameboy Advance"};
 //	if (m_rom->get_loaded())
 //		renderer_output_log("Current GB Type : %s \n",gb_names[m_rom->get_info()->gb_type]);
@@ -140,8 +142,6 @@ bool gb_load_rom(byte *buf,int size,byte *ram,int ram_size)
 {
 	if (rom_load_rom(buf,size,ram,ram_size)){
 		gb_reset();
-		free_rewind_states();
-		allocate_rewind_states();
 		return true;
 	}
 	else
