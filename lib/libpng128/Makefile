@@ -11,7 +11,7 @@ ZLIBLIB = ../zlib122
 CC = psp-gcc
 LD = $(CC)
 AR = psp-ar rcs
-RANLIB = ranlib
+RANLIB = psp-ranlib
 RM = rm -f
 
 CDEBUG = -g -DPNG_DEBUG=5
