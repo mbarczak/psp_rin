@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 project(rin C CXX)
+add_executable(testProgress tools.c)
 include(/usr/local/pspdev/psp/share/cmake/PSP.cmake)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -27,5 +28,6 @@ set(return_list ".")
 
 
 
-add_executable(rin ${all_src} tools.c tools.h menu_rewind.c menu_rewind.h menu_credits.c menu_credits.h)
+add_executable(rin ${all_src} tools.c tools.h menu_rewind.c menu_rewind.h menu_credits.c menu_credits.h tools.c)
+
 set_target_properties(rin PROPERTIES LINKER_LANGUAGE CXX)

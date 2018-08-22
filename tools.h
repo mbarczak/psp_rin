@@ -20,5 +20,5 @@ static inline unsigned byte2kb(unsigned bytes){
 	return bytes/1024;
 }
 
-void ftoa(float n, char *res, int afterpoint);
+char* get_progress_bar(int max, int act);
 #endif //RIN_TOOLS_H

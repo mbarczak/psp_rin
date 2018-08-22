@@ -262,7 +262,7 @@ void mainloop(void)
 				wavout_enable=0;
 
 				while(1){
-
+					renderer_set_msg(get_rewind_progress_bar());
 					//begin rewinds
 					if( read_rewind_state() > 0 ){
 

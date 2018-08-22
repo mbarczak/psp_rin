@@ -38,5 +38,6 @@ void test_available_memory(void);
 unsigned establish_max_rewind_memory(void);
 unsigned get_current_rewind_memory(SETTING local);
 void print_rewind_debug_info(SETTING local,char* info);
+char* get_rewind_progress_bar();
 
 #endif

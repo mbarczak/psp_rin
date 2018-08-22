@@ -24,6 +24,7 @@ static char* credits[] = {
 	"    - Dedicated menu for rewind,",
 	"    - Support for extra memory (PSP Slim),",
 	"    - Adjustable memory and states amount in rewind,",
+	"    - Progress bar for actual rewind status,",
 	"    - Fixed crash when loading game with a different",
 	"      save size than the previous one,",
 	"    - Fixed crash when putting PSP to sleep while",

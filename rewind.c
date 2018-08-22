@@ -22,9 +22,28 @@ struct rewind_state{
 	struct rewind_state *prev;
 };
 
-
 struct rewind_state *ptr_rewind_states, *prev_state, *next_state;
 
+int get_used_rewind_states_number(){
+	int retVal = 0;
+	if(setting.rewind_enabled && ptr_rewind_states != NULL){
+		struct rewind_state* act = ptr_rewind_states->next;
+		while(act != ptr_rewind_states){
+			if(act->have_data){
+				retVal++;
+			}
+			act = act->next;
+		}
+	}
+	return retVal;
+}
+
+char* get_rewind_progress_bar(){
+	int max = num_rwnd_states;
+	int act = get_used_rewind_states_number();
+
+	return get_progress_bar(max,act);
+}
 
 static void set_number_of_rewind_states(int *number_of_states);
 
