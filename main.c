@@ -260,18 +260,25 @@ void mainloop(void)
 			if( get_nShortcutKey(paddata.buttons) == 8 ){ // 8 == REWIND_SHORTCUT KEY
 
 				wavout_enable=0;
-
+				int refreshProgress = 0;
 				while(1){
 					renderer_set_msg(get_rewind_progress_bar());
 					//begin rewinds
 					if( read_rewind_state() > 0 ){
-
+						refreshProgress = 1;
 						for(line=0; line<154; line++) //emulate a frame
 							gb_run();
 
 						pgScreenFlip();
-					}
+					}else{
+						if(refreshProgress){
+							for(line=0; line<154; line++) //emulate a frame
+								gb_run();
 
+							pgScreenFlip();
+							refreshProgress = 0;
+						}
+					}
 					sceKernelDelayThread(WAIT_MILIS);
 
 

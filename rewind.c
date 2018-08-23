@@ -10,6 +10,7 @@ e-mail: efengeler@gmail.com
 
 int num_rwnd_states = 0;
 int rwnd_state_size = 0;
+int number_of_used_states = 0;
 const int TOTAL_REWIND_MEMORY = 5*1024*1024; //reserves 5 MB for rewind states
 const int SAFE_MEMORY_MARGIN = 1*1024*1024;//left for system to use
 unsigned max_rewind_memory = 5*1024*1024;
@@ -25,17 +26,23 @@ struct rewind_state{
 struct rewind_state *ptr_rewind_states, *prev_state, *next_state;
 
 int get_used_rewind_states_number(){
-	int retVal = 0;
-	if(setting.rewind_enabled && ptr_rewind_states != NULL){
-		struct rewind_state* act = ptr_rewind_states->next;
-		while(act != ptr_rewind_states){
-			if(act->have_data){
-				retVal++;
-			}
-			act = act->next;
-		}
-	}
-	return retVal;
+//	int retVal = 0;
+//	if(setting.rewind_enabled && ptr_rewind_states != NULL){
+//		if(ptr_rewind_states->have_data){
+//			retVal++;
+//		}
+//		struct rewind_state* act = ptr_rewind_states->next;
+//		while(act != ptr_rewind_states){
+//			if(act->have_data){
+//				retVal++;
+//			}
+//			act = act->next;
+//		}
+//	}
+//	return retVal;
+//	printf("NUM STATES DIRECT: %d\n",retVal);
+//	printf("NUM STATES VARIAB: %d\n\n",number_of_used_states);
+	return number_of_used_states;
 }
 
 char* get_rewind_progress_bar(){
@@ -75,6 +82,7 @@ void allocate_rewind_states(void){
 		created_state->next = first_state;
 		first_state->prev = created_state;
 		ptr_rewind_states = first_state;
+		number_of_used_states = 0;
 	}
 
 	print_rewind_debug_info(setting,"allocate_rewind_states");
@@ -100,9 +108,9 @@ static void set_number_of_rewind_states(int *number_of_states) {
 }
 
 void free_rewind_states(void){
-	
-	struct rewind_state *now_state; 
-	
+
+	struct rewind_state *now_state;
+
 	now_state = ptr_rewind_states;
 	if(ptr_rewind_states){
         prev_state = now_state->prev;
@@ -117,25 +125,30 @@ void free_rewind_states(void){
             now_state = next_state;
         }
         ptr_rewind_states = NULL;
+        number_of_used_states = 0;
 	}
 }
 
 
 void save_rewind_state(void){
-	
+
 	gb_save_state(ptr_rewind_states->data); //declared in "gbcore/gb.h"
+	if(!ptr_rewind_states->have_data){
+		number_of_used_states++;
+	}
 	ptr_rewind_states->have_data = 1;
 	ptr_rewind_states = ptr_rewind_states->next;
 }
 
 int read_rewind_state(void){
-	
+
 	int ret_val = -999;
 	prev_state = ptr_rewind_states->prev;
 
 	if (prev_state->have_data > 0 ){
 		load_state_tmp( prev_state->data); //declarado en "saveload.h"
 		prev_state->have_data = 0;
+		number_of_used_states--;
 		ptr_rewind_states = ptr_rewind_states->prev;
 		ret_val = 1;
 	}

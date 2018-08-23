@@ -173,7 +173,7 @@ static void print_rewind_states_limit_line(unsigned long *x, unsigned long *y, c
 
 static void print_rewind_states_help(unsigned long *x, unsigned long *y, const SETTING *local, const long sel) {
 #define HELP_COLOR RGB(26, 163, 255)
-	unsigned help_y = 15;
+	unsigned help_y = 13;
 	unsigned help_x = 4;
 	char tmpString[MAX_MENU_ENTRY_LENGTH] = {0};
 	if(local->rewind_always_use_max_states){
@@ -184,15 +184,19 @@ static void print_rewind_states_help(unsigned long *x, unsigned long *y, const S
 
 	pgPrintf(help_x,help_y,HELP_COLOR, "---------------------------------------------------");
 	help_y += 2;
-	pgPrintf(help_x,help_y,HELP_COLOR, "On newer PSP models more memory for rewind can be ");
+	pgPrintf(help_x,help_y,HELP_COLOR, "On newer PSP models (PSP Slim and higher), more");
 	help_y += 1;
-	pgPrintf(help_x,help_y,HELP_COLOR, "enabled by using CFW with extra memory for homebrew");
+	pgPrintf(help_x,help_y,HELP_COLOR, "memory for rewind can be enabled by using CFW with");
 	help_y += 1;
-	pgPrintf(help_x,help_y,HELP_COLOR, "support. Enter recovery menu and enable:");
+	pgPrintf(help_x,help_y,HELP_COLOR, "extra memory for homebrew support.");
+	help_y += 1;
+	pgPrintf(help_x,help_y,HELP_COLOR, "Enter recovery menu and enable:");
 	help_y += 1;
 	pgPrintf(help_x,help_y,HELP_COLOR, "\"Advanced/Force High Memory Layout\".");
+	help_y += 1;
+	pgPrintf(help_x,help_y,HELP_COLOR, "The same applies to PS Vita with Adrenaline.");
 	help_y += 2;
-	pgPrintf(help_x,help_y,HELP_COLOR, "---------------------------------------------------");
+	pgPrintf(help_x,help_y,HELP_COLOR, "----------------------------------------------------");
 	help_y += 1;
 	pgPrintf(help_x,help_y,HELP_COLOR, "");
 }

@@ -14,9 +14,9 @@ char *get_progress_bar(int max, int act) {
 	const char ACT_CHAR = 9;
 	const char BUILD_CHAR = 10;
 	static char progress[MAX_PROGRESS];
-	static char string[MAX_STR];
+//	static char string[MAX_STR];
 	if (max == 0) {
-		string[0] = '\0';
+		progress[0] = '\0';
 	} else {
 		memset(progress, BUILD_CHAR, MAX_PROGRESS);
 
@@ -33,11 +33,11 @@ char *get_progress_bar(int max, int act) {
 		}
 		progress[actInBar] = ACT_CHAR;
 
-		memset(string, 0, MAX_STR);
+//		memset(string, 0, MAX_STR);
 //		snprintf(string, MAX_STR, " Rewind :%s", progress);
-		snprintf(string, MAX_STR, "%s", progress);
+//		snprintf(string, MAX_STR, "%s", progress);
 	}
-	return string;
+	return progress;
 }
 
 //#define TESTING

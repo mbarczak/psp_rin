@@ -11,7 +11,6 @@ static unsigned long get_text_color() {
 static char* credits[] = {
 	"     RIN REWIND MOD CREDITS AND VERSION HISTORY",
 	"",
-	"",
 	"Mr. Mirakichi - 2005/08/22",
 	"  Original version of RIN 1.32",
 	"",
@@ -22,7 +21,8 @@ static char* credits[] = {
 	"  Rewind mod v2 (this version):",
 	"    - Sources ported to latest PSP SDK,",
 	"    - Dedicated menu for rewind,",
-	"    - Support for extra memory (PSP Slim),",
+	"    - Support for extra memory (PSP Slim and higher,",
+	"      PS Vita with Adrenaline)",
 	"    - Adjustable memory and states amount in rewind,",
 	"    - Progress bar for actual rewind status,",
 	"    - Fixed crash when loading game with a different",
