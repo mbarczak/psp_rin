@@ -196,7 +196,9 @@ void pgBitBltSgb(unsigned long x,unsigned long y,unsigned long *d)
 
 	v0=(unsigned long *)pgGetVramAddr(x,y);
 	for (yy=0; yy<224; yy++) {
-		__memcpy4a(v0,d,256/2);
+		__memcpy4(v0,d,256/2);
+		v0+=256/2;
+		d+=256/2;
 		v0+=(LINESIZE/2-256/2);
 	}
 }
@@ -210,7 +212,9 @@ void pgBitBltN1(unsigned long x,unsigned long y,unsigned long *d)
 	v0=(unsigned long *)pgGetVramAddr(x,y);
 	d+=GUARD_LINE/2;
 	for (yy=0; yy<144; yy++) {
-		__memcpy4a(v0,d,80);
+		__memcpy4(v0,d,80);
+		d+=80;
+		v0+=80;
 		v0+=(LINESIZE/2-80);
 		d+=GUARD_LINE;
 	}

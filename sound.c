@@ -19,7 +19,7 @@ static void wavout_snd0_callback(short *buf, unsigned long reqn)
 	unsigned int ptr=cur_play;
 	unsigned int nextptr=ptr+reqn;
 	if (nextptr>=sound_buf_len*4) nextptr=0;
-	__memcpy4a((unsigned long *)buf, (unsigned long *)&sound_buf[ptr*2], reqn);
+	__memcpy4((unsigned long *)buf, (unsigned long *)&sound_buf[ptr*2], reqn);
 //	__memcpy4((unsigned long *)buf, (unsigned long *)&sound_buf[ptr*2], reqn);
 	cur_play=nextptr;
 }

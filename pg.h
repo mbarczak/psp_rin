@@ -149,7 +149,7 @@ static inline void __memcpy4a(unsigned long *d, unsigned long *s, unsigned long 
 	);
 }
 
-#define __USE_MIPS32R2__
+//#define __USE_MIPS32R2__
 
 static inline void cpy2x(unsigned long *d, unsigned long cc)
 {
